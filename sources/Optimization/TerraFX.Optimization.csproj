@@ -3,11 +3,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <NoWarn>1591;$(NoWarn)</NoWarn>
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\sources\Optimizer\TerraFX.Optimizer.csproj" />
+    <PackageReference Include="TerraFX.Utilities" />
   </ItemGroup>
 
 </Project>

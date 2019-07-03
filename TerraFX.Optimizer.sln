@@ -37,11 +37,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sources", "sources", "{0B82
 		sources\Directory.Build.targets = sources\Directory.Build.targets
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Optimization", "Optimization", "{9EC8DCF1-639B-4C5F-AD99-77E30D51393C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerraFX.Optimization", "sources\Optimization\TerraFX.Optimization.csproj", "{039611EC-89D5-4010-B732-7CF31B4CFA69}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Optimizer", "Optimizer", "{49107E22-6DFB-4C57-A3D1-8F9C69D22406}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerraFX.Optimizer", "sources\Optimizer\TerraFX.Optimizer.csproj", "{0EB1EAEB-6645-49C7-977F-8A93EEACE74E}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EFB05081-EC44-49D3-B6D1-52AE42085B5B}"
 	ProjectSection(SolutionItems) = preProject
 		tests\Directory.Build.props = tests\Directory.Build.props
 		tests\Directory.Build.targets = tests\Directory.Build.targets
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Optimization", "Optimization", "{77FBA110-86F8-4A94-8705-C31CC96673DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerraFX.Optimization.UnitTests", "tests\Optimization\TerraFX.Optimization.UnitTests.csproj", "{9E8C6582-63D1-4A36-8E63-611A656E725E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{48E1F49D-7103-4DE6-9F69-915183B85095}"
 	ProjectSection(SolutionItems) = preProject
@@ -55,14 +67,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{48E1
 		scripts\cibuild.cmd = scripts\cibuild.cmd
 		scripts\cibuild.sh = scripts\cibuild.sh
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Optimizer", "Optimizer", "{49107E22-6DFB-4C57-A3D1-8F9C69D22406}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Optimizer", "Optimizer", "{77FBA110-86F8-4A94-8705-C31CC96673DD}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerraFX.Optimizer", "sources\Optimizer\TerraFX.Optimizer.csproj", "{0EB1EAEB-6645-49C7-977F-8A93EEACE74E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerraFX.Optimizer.UnitTests", "tests\Optimizer\TerraFX.Optimizer.UnitTests.csproj", "{9E8C6582-63D1-4A36-8E63-611A656E725E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +82,10 @@ Global
 		{9E8C6582-63D1-4A36-8E63-611A656E725E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E8C6582-63D1-4A36-8E63-611A656E725E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E8C6582-63D1-4A36-8E63-611A656E725E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +95,8 @@ Global
 		{77FBA110-86F8-4A94-8705-C31CC96673DD} = {EFB05081-EC44-49D3-B6D1-52AE42085B5B}
 		{0EB1EAEB-6645-49C7-977F-8A93EEACE74E} = {49107E22-6DFB-4C57-A3D1-8F9C69D22406}
 		{9E8C6582-63D1-4A36-8E63-611A656E725E} = {77FBA110-86F8-4A94-8705-C31CC96673DD}
+		{9EC8DCF1-639B-4C5F-AD99-77E30D51393C} = {0B821858-8E47-4485-AC06-D2E971A53EB2}
+		{039611EC-89D5-4010-B732-7CF31B4CFA69} = {9EC8DCF1-639B-4C5F-AD99-77E30D51393C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2FE36DF8-2D9C-4F20-8787-45DC74B57461}
