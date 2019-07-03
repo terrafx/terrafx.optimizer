@@ -1,6 +1,7 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
 using System;
+using System.Reflection.Metadata;
 using static TerraFX.Optimization.CodeAnalysis.ControlFlowKind;
 using static TerraFX.Optimization.CodeAnalysis.InputBehaviorKind;
 using static TerraFX.Optimization.CodeAnalysis.OpcodeKind;
@@ -43,7 +44,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public static bool operator !=(Opcode left, Opcode right) => left.Kind != right.Kind;
 
-        internal static Opcode Create(OpcodeKind name) => name switch
+        public static Opcode Create(OpcodeKind kind) => kind switch
         {
             Nop => new Opcode(Nop, "nop", Pop0, Push0, InlineNone, 1, 0x0000, Next),
             OpcodeKind.Break => new Opcode(OpcodeKind.Break, "break", Pop0, Push0, InlineNone, 1, 0x0001, ControlFlowKind.Break),
@@ -335,8 +336,15 @@ namespace TerraFX.Optimization.CodeAnalysis
             // unused: 0xFE20,
             // unused: 0xFE21,
             // unused: 0xFE22,
-            _ => throw new ArgumentOutOfRangeException(nameof(name))
+            _ => throw new ArgumentOutOfRangeException(nameof(kind))
         };
+
+        public Operand CreateOperand(MetadataReader metadataReader, object? value)
+        {
+            var operand = new Operand(metadataReader, OperandKind, value: null);
+            operand.Value = value;
+            return operand;
+        }
 
         public override bool Equals(object obj) => (obj is Opcode other) && Equals(other);
 

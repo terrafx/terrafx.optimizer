@@ -5,6 +5,9 @@ namespace TerraFX.Optimization.CodeAnalysis
     /// <summary>Describes the type of inline argument to an instruction.</summary>
     public enum OperandKind
     {
+        /// <summary>No in-line argument.</summary>
+        InlineNone,
+
         /// <summary>Branch target, represented as a 4-byte signed integer from the beginning of the instruction following the current instruction.</summary>
         InlineBrTarget,
 
@@ -19,9 +22,6 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         /// <summary>Metadata token (4 bytes) representing a MethodRef (i.e., a MemberRef to a method) or MethodDef point number.</summary>
         InlineMethod,
-
-        /// <summary>No in-line argument.</summary>
-        InlineNone,
 
         /// <summary>8-byte floating point number.</summary>
         InlineR,

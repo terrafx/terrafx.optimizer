@@ -5,6 +5,9 @@ namespace TerraFX.Optimization.CodeAnalysis
     /// <summary>Describes the control flow implications of an instruction.</summary>
     public enum ControlFlowKind
     {
+        /// <summary>Control flow unaltered ("fall through").</summary>
+        Next,
+
         /// <summary>Unconditional branch.</summary>
         Branch,
 
@@ -18,9 +21,6 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         /// <summary>Unused operation or prefix code.</summary>
         Meta,
-
-        /// <summary>Control flow unaltered ("fall through").</summary>
-        Next,
 
         /// <summary>Return from method.</summary>
         Return,
