@@ -14,4 +14,8 @@
     <PackageReference Include="TerraFX.Utilities" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Optimization\TerraFX.Optimization.csproj" />
+  </ItemGroup>
+
 </Project>

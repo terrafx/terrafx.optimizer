@@ -1,4 +1,4 @@
-// Copyright Â© Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
+// Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
 using System.CommandLine;
 using System.CommandLine.Invocation;
@@ -23,6 +23,9 @@ namespace TerraFX.Optimization
         public static int Run(InvocationContext context)
         {
             int exitCode = 0;
+
+
+
             return exitCode;
         }
     }

@@ -61,7 +61,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                     case OperandKind.InlineSwitch:
                     {
-                        var count = ((ImmutableArray<int>)Value!).Length;
+                        var count = (Value is ImmutableArray<Instruction> immutableTargets) ? immutableTargets.Length : ((int[])Value!).Length;
                         size = 4 + (count * 4);
                         break;
                     }
@@ -125,25 +125,15 @@ namespace TerraFX.Optimization.CodeAnalysis
                                 if (memberReference.GetKind() == MemberReferenceKind.Field)
                                 {
                                     value = memberReference;
-                                }
-                                else
-                                {
-                                    argumentOutOfRange = true;
+                                    argumentOutOfRange = false;
                                 }
                             }
                             else if (entityHandle.Kind == HandleKind.FieldDefinition)
                             {
                                 var fieldDefinitionHandle = (FieldDefinitionHandle)entityHandle;
                                 value = MetadataReader.GetFieldDefinition(fieldDefinitionHandle);
+                                argumentOutOfRange = false;
                             }
-                            else
-                            {
-                                argumentOutOfRange = true;
-                            }
-                        }
-                        else
-                        {
-                            argumentOutOfRange = true;
                         }
                         break;
                     }
@@ -172,25 +162,21 @@ namespace TerraFX.Optimization.CodeAnalysis
                                 if (memberReference.GetKind() == MemberReferenceKind.Method)
                                 {
                                     value = memberReference;
-                                }
-                                else
-                                {
-                                    argumentOutOfRange = true;
+                                    argumentOutOfRange = false;
                                 }
                             }
                             else if (entityHandle.Kind == HandleKind.MethodDefinition)
                             {
                                 var methodDefinitionHandle = (MethodDefinitionHandle)entityHandle;
                                 value = MetadataReader.GetMethodDefinition(methodDefinitionHandle);
+                                argumentOutOfRange = false;
                             }
-                            else
+                            else if (entityHandle.Kind == HandleKind.MethodSpecification)
                             {
-                                argumentOutOfRange = true;
+                                var methodSpecificationHandle = (MethodSpecificationHandle)entityHandle;
+                                value = MetadataReader.GetMethodSpecification(methodSpecificationHandle);
+                                argumentOutOfRange = false;
                             }
-                        }
-                        else
-                        {
-                            argumentOutOfRange = true;
                         }
                         break;
                     }
@@ -203,13 +189,21 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                     case OperandKind.InlineSig:
                     {
-                        argumentOutOfRange = value?.GetType() != typeof(StandaloneSignatureHandle);
+                        if (value is StandaloneSignatureHandle standaloneSignatureHandle)
+                        {
+                            value = MetadataReader.GetStandaloneSignature(standaloneSignatureHandle);
+                            argumentOutOfRange = false;
+                        }
                         break;
                     }
 
                     case OperandKind.InlineString:
                     {
-                        argumentOutOfRange = value?.GetType() != typeof(UserStringHandle);
+                        if (value is UserStringHandle userStringHandle)
+                        {
+                            value = MetadataReader.GetUserString(userStringHandle);
+                            argumentOutOfRange = false;
+                        }
                         break;
                     }
 
@@ -233,25 +227,20 @@ namespace TerraFX.Optimization.CodeAnalysis
                             {
                                 var typeDefinitionHandle = (TypeDefinitionHandle)entityHandle;
                                 value = MetadataReader.GetTypeDefinition(typeDefinitionHandle);
+                                argumentOutOfRange = false;
                             }
                             else if (entityHandle.Kind == HandleKind.TypeReference)
                             {
                                 var typeReferenceHandle = (TypeReferenceHandle)entityHandle;
                                 value = MetadataReader.GetTypeReference(typeReferenceHandle);
+                                argumentOutOfRange = false;
                             }
                             else if (entityHandle.Kind == HandleKind.TypeSpecification)
                             {
                                 var typeSpecificationHandle = (TypeSpecificationHandle)entityHandle;
                                 value = MetadataReader.GetTypeSpecification(typeSpecificationHandle);
+                                argumentOutOfRange = false;
                             }
-                            else
-                            {
-                                argumentOutOfRange = true;
-                            }
-                        }
-                        else
-                        {
-                            argumentOutOfRange = true;
                         }
                         break;
                     }
@@ -315,6 +304,42 @@ namespace TerraFX.Optimization.CodeAnalysis
                     AppendOffset(builder, targetInstructions[lastIndex]);
                     builder.Append(')');
                 }
+                else if (value is FieldDefinition fieldDefinition)
+                {
+                    var declaringType = MetadataReader.GetTypeDefinition(fieldDefinition.GetDeclaringType());
+                    AppendQualifiedName(builder, MetadataReader, declaringType.Namespace, declaringType.Name);
+
+                    var name = MetadataReader.GetString(fieldDefinition.Name);
+                    builder.Append(name);
+                }
+                else if (value is MethodDefinition methodDefinition)
+                {
+                    var declaringType = MetadataReader.GetTypeDefinition(methodDefinition.GetDeclaringType());
+                    AppendQualifiedName(builder, MetadataReader, declaringType.Namespace, declaringType.Name);
+
+                    var name = MetadataReader.GetString(methodDefinition.Name);
+                    builder.Append(name);
+                }
+                else if (value is MemberReference memberReference)
+                {
+                    builder.Append(memberReference);
+                }
+                else if (value is StandaloneSignature standaloneSignature)
+                {
+                    builder.Append(standaloneSignature);
+                }
+                else if (value is TypeDefinition typeDefinition)
+                {
+                    AppendQualifiedName(builder, MetadataReader, typeDefinition.Namespace, typeDefinition.Name);
+                }
+                else if (value is TypeReference typeReference)
+                {
+                    AppendQualifiedName(builder, MetadataReader, typeReference.Namespace, typeReference.Name);
+                }
+                else if (value is TypeSpecification typeSpecification)
+                {
+                    builder.Append(typeSpecification);
+                }
                 else
                 {
                     builder.Append(value);
@@ -328,6 +353,20 @@ namespace TerraFX.Optimization.CodeAnalysis
                 builder.Append("IL_");
                 var offset = instruction.GetOffset();
                 builder.Append(offset.ToString("X4"));
+            }
+
+            static void AppendQualifiedName(StringBuilder builder, MetadataReader metadataReader, StringHandle namespaceNameHandle, StringHandle nameHandle)
+            {
+                var namespaceName = metadataReader.GetString(namespaceNameHandle);
+
+                if (string.IsNullOrWhiteSpace(namespaceName) == false)
+                {
+                    builder.Append(namespaceName);
+                    builder.Append('.');
+                }
+
+                var name = metadataReader.GetString(nameHandle);
+                builder.Append(name);
             }
         }
     }
