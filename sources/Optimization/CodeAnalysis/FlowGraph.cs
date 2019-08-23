@@ -225,14 +225,14 @@ namespace TerraFX.Optimization.CodeAnalysis
             {
                 BasicBlock childBlock;
 
-                if (firstInstructionMap.TryGetValue(firstInstruction, out childBlock))
+                if (firstInstructionMap.TryGetValue(firstInstruction, out childBlock!))
                 {
                     // This is already the first instruction of a block, so we don't need
                     // to do anything and can just return.
 
                     Assert(instructionMap.ContainsKey(firstInstruction), "Expected instruction to have been processed already.");
                 }
-                else if (instructionMap.TryGetValue(firstInstruction, out childBlock))
+                else if (instructionMap.TryGetValue(firstInstruction, out childBlock!))
                 {
                     // This instruction has already been processed, but it is not the first
                     // instruction of the block it belongs to. We need to create a new block
