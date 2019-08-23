@@ -346,7 +346,7 @@ namespace TerraFX.Optimization.CodeAnalysis
             return operand;
         }
 
-        public override bool Equals(object obj) => (obj is Opcode other) && Equals(other);
+        public override bool Equals(object? obj) => (obj is Opcode other) && Equals(other);
 
         public bool Equals(Opcode other) => this == other;
 

@@ -8,15 +8,13 @@ namespace TerraFX.Optimization
 {
     public static class Program
     {
-        private static RootCommand s_rootCommand;
+        private static RootCommand s_rootCommand = new RootCommand();
 
         public static async Task<int> Main(params string[] args)
         {
-            s_rootCommand = new RootCommand();
-            {
-                s_rootCommand.Description = "TerraFX IL Optimizer";
-                s_rootCommand.Handler = CommandHandler.Create(typeof(Program).GetMethod(nameof(Run)));
-            }
+            s_rootCommand.Description = "TerraFX IL Optimizer";
+            s_rootCommand.Handler = CommandHandler.Create(typeof(Program).GetMethod(nameof(Run)));
+
             return await s_rootCommand.InvokeAsync(args);
         }
 
