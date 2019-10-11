@@ -275,22 +275,22 @@ namespace TerraFX.Optimization.CodeAnalysis
         {
             var builder = new StringBuilder();
 
-            builder.Append("IL_");
+            _ = builder.Append("IL_");
             var offset = GetOffset();
-            builder.Append(offset.ToString("X4"));
+            _ = builder.Append(offset.ToString("X4"));
 
-            builder.Append(':');
-            builder.Append(' ', 2);
+            _ = builder.Append(':');
+            _ = builder.Append(' ', 2);
 
             var opcodeName = Opcode.Name;
-            builder.Append(opcodeName);
+            _ = builder.Append(opcodeName);
 
             var operand = Operand.ToString();
 
             if (operand != string.Empty)
             {
-                builder.Append(' ', 16 - opcodeName.Length);
-                builder.Append(operand);
+                _ = builder.Append(' ', 16 - opcodeName.Length);
+                _ = builder.Append(operand);
             }
 
             return builder.ToString();

@@ -109,8 +109,8 @@ namespace TerraFX.Optimization.CodeAnalysis
                                 // to add the existing block as a child of the current block and return
                                 // false so that we stop processing this sequence.
 
-                                currentBlock._children.Add(childBlock);
-                                childBlock._parents.Add(currentBlock);
+                                _ = currentBlock._children.Add(childBlock);
+                                _ = childBlock._parents.Add(currentBlock);
 
                                 instruction = null;
                             }
@@ -192,7 +192,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                     {
                         // Ensure the next instruction has already been processed or is part of the pending
                         // block list so that we can properly track dead/dangling code for later cleanup.
-                        ProcessFirstInstruction(nextInstruction, instructionMap, firstInstructionMap, pendingBlocks);
+                        _ = ProcessFirstInstruction(nextInstruction, instructionMap, firstInstructionMap, pendingBlocks);
                     }
                 }
             }
@@ -217,8 +217,8 @@ namespace TerraFX.Optimization.CodeAnalysis
             {
                 var childBlock = ProcessFirstInstruction(firstInstruction, instructionMap, firstInstructionMap, pendingBlocks);
 
-                parentBlock._children.Add(childBlock);
-                childBlock._parents.Add(parentBlock);
+                _ = parentBlock._children.Add(childBlock);
+                _ = childBlock._parents.Add(parentBlock);
             }
 
             static BasicBlock ProcessFirstInstruction(Instruction firstInstruction, Dictionary<Instruction, BasicBlock> instructionMap, Dictionary<Instruction, BasicBlock> firstInstructionMap, Stack<BasicBlock> pendingBlocks)
@@ -250,8 +250,8 @@ namespace TerraFX.Optimization.CodeAnalysis
                     targetBlock._children = childBlock._children;
                     childBlock._children = new HashSet<BasicBlock>();
 
-                    childBlock._children.Add(targetBlock);
-                    targetBlock._parents.Add(childBlock);
+                    _ = childBlock._children.Add(targetBlock);
+                    _ = targetBlock._parents.Add(childBlock);
                 }
                 else
                 {

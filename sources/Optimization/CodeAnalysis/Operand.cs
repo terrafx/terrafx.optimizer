@@ -2,8 +2,10 @@
 
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Text;
+using TerraFX.Utilities;
 using static TerraFX.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis
@@ -287,72 +289,133 @@ namespace TerraFX.Optimization.CodeAnalysis
             {
                 if (value is Instruction targetInstruction)
                 {
-                    AppendOffset(builder, targetInstruction);
+                    AppendTargetInstruction(builder, targetInstruction);
                 }
                 else if (value is ImmutableArray<Instruction> targetInstructions)
                 {
-                    builder.Append('(');
-                    var lastIndex = targetInstructions.Length - 1;
-
-                    for (int i = 0; i < lastIndex; i++)
-                    {
-                        AppendOffset(builder, targetInstructions[i]);
-                        builder.Append(',');
-                        builder.Append(' ');
-                    }
-
-                    AppendOffset(builder, targetInstructions[lastIndex]);
-                    builder.Append(')');
+                    AppendTargetInstructions(builder, targetInstructions);
                 }
                 else if (value is FieldDefinition fieldDefinition)
                 {
-                    var declaringType = MetadataReader.GetTypeDefinition(fieldDefinition.GetDeclaringType());
-                    AppendQualifiedName(builder, MetadataReader, declaringType.Namespace, declaringType.Name);
-
-                    var name = MetadataReader.GetString(fieldDefinition.Name);
-                    builder.Append(name);
+                    AppendFieldDefinition(builder, MetadataReader, fieldDefinition);
                 }
                 else if (value is MethodDefinition methodDefinition)
                 {
-                    var declaringType = MetadataReader.GetTypeDefinition(methodDefinition.GetDeclaringType());
-                    AppendQualifiedName(builder, MetadataReader, declaringType.Namespace, declaringType.Name);
-
-                    var name = MetadataReader.GetString(methodDefinition.Name);
-                    builder.Append(name);
+                    AppendMethodDefinition(builder, MetadataReader, methodDefinition);
                 }
                 else if (value is MemberReference memberReference)
                 {
-                    builder.Append(memberReference);
+                    AppendMemberReference(builder, MetadataReader, memberReference);
                 }
                 else if (value is StandaloneSignature standaloneSignature)
                 {
-                    builder.Append(standaloneSignature);
+                    AppendStandaloneSignature(builder, MetadataReader, standaloneSignature);
                 }
                 else if (value is TypeDefinition typeDefinition)
                 {
-                    AppendQualifiedName(builder, MetadataReader, typeDefinition.Namespace, typeDefinition.Name);
+                    AppendTypeDefinition(builder, MetadataReader, typeDefinition);
                 }
                 else if (value is TypeReference typeReference)
                 {
-                    AppendQualifiedName(builder, MetadataReader, typeReference.Namespace, typeReference.Name);
+                    AppendTypeReference(builder, MetadataReader, typeReference);
                 }
                 else if (value is TypeSpecification typeSpecification)
                 {
-                    builder.Append(typeSpecification);
+                    AppendTypeSpecification(builder, MetadataReader, typeSpecification);
                 }
                 else
                 {
-                    builder.Append(value);
+                    _ = builder.Append(value);
                 }
             }
 
             return builder.ToString();
 
+            static void AppendFieldDefinition(StringBuilder builder, MetadataReader metadataReader, FieldDefinition fieldDefinition)
+            {
+                var declaringType = metadataReader.GetTypeDefinition(fieldDefinition.GetDeclaringType());
+                AppendQualifiedName(builder, metadataReader, declaringType.Namespace, declaringType.Name);
+
+                var name = metadataReader.GetString(fieldDefinition.Name);
+                _ = builder.Append(name);
+            }
+
+            static void AppendMethodDefinition(StringBuilder builder, MetadataReader metadataReader, MethodDefinition methodDefinition)
+            {
+                var declaringType = metadataReader.GetTypeDefinition(methodDefinition.GetDeclaringType());
+                AppendQualifiedName(builder, metadataReader, declaringType.Namespace, declaringType.Name);
+
+                _ = builder.Append('.');
+
+                var name = metadataReader.GetString(methodDefinition.Name);
+                _ = builder.Append(name);
+            }
+
+            static void AppendMemberReference(StringBuilder builder, MetadataReader metadataReader, MemberReference memberReference)
+            {
+                var parent = memberReference.Parent;
+
+                switch (parent.Kind)
+                {
+                    case HandleKind.MethodDefinition:
+                    {
+                        var methodDefinition = metadataReader.GetMethodDefinition((MethodDefinitionHandle)parent);
+                        AppendMethodDefinition(builder, metadataReader, methodDefinition);
+                        break;
+                    }
+
+                    case HandleKind.ModuleReference:
+                    {
+                        var moduleReference = metadataReader.GetModuleReference((ModuleReferenceHandle)parent);
+                        AppendModuleReference(builder, metadataReader, moduleReference);
+                        break;
+                    }
+
+                    case HandleKind.TypeDefinition:
+                    {
+                        var typeDefinition = metadataReader.GetTypeDefinition((TypeDefinitionHandle)parent);
+                        AppendTypeDefinition(builder, metadataReader, typeDefinition);
+                        break;
+                    }
+
+                    case HandleKind.TypeReference:
+                    {
+                        var typeReference = metadataReader.GetTypeReference((TypeReferenceHandle)parent);
+                        AppendTypeReference(builder, metadataReader, typeReference);
+                        break;
+                    }
+
+                    case HandleKind.TypeSpecification:
+                    {
+                        var typeSpecification = metadataReader.GetTypeSpecification((TypeSpecificationHandle)parent);
+                        AppendTypeSpecification(builder, metadataReader, typeSpecification);
+                        break;
+                    }
+
+                    default:
+                    {
+                        ThrowInvalidOperationException(nameof(parent.Kind), parent.Kind);
+                        break;
+                    }
+                }
+
+                _ = builder.Append('.');
+
+                var name = metadataReader.GetString(memberReference.Name);
+                _ = builder.Append(name);
+            }
+
+            static void AppendModuleReference(StringBuilder builder, MetadataReader metadataReader, ModuleReference moduleReference)
+            {
+                var name = metadataReader.GetString(moduleReference.Name);
+                _ = builder.Append(name);
+            }
+
             static void AppendOffset(StringBuilder builder, Instruction instruction)
             {
-                builder.Append("IL_");
+                _ = builder.Append("IL_");
                 var offset = instruction.GetOffset();
-                builder.Append(offset.ToString("X4"));
+                _ = builder.Append(offset.ToString("X4"));
             }
 
             static void AppendQualifiedName(StringBuilder builder, MetadataReader metadataReader, StringHandle namespaceNameHandle, StringHandle nameHandle)
@@ -361,12 +424,55 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                 if (string.IsNullOrWhiteSpace(namespaceName) == false)
                 {
-                    builder.Append(namespaceName);
-                    builder.Append('.');
+                    _ = builder.Append(namespaceName);
+                    _ = builder.Append('.');
                 }
 
                 var name = metadataReader.GetString(nameHandle);
-                builder.Append(name);
+                _ = builder.Append(name);
+            }
+
+            static void AppendStandaloneSignature(StringBuilder builder, MetadataReader metadataReader, StandaloneSignature standaloneSignature)
+            {
+                Debug.WriteLine("StandaloneSignatures are not supported.");
+                _ = builder.Append(standaloneSignature);
+            }
+
+            static void AppendTargetInstruction(StringBuilder builder, Instruction targetInstruction)
+            {
+                AppendOffset(builder, targetInstruction);
+            }
+
+            static void AppendTargetInstructions(StringBuilder builder, ImmutableArray<Instruction> targetInstructions)
+            {
+                _ = builder.Append('(');
+                var lastIndex = targetInstructions.Length - 1;
+
+                for (int i = 0; i < lastIndex; i++)
+                {
+                    AppendTargetInstruction(builder, targetInstructions[i]);
+                    _ = builder.Append(',');
+                    _ = builder.Append(' ');
+                }
+
+                AppendTargetInstruction(builder, targetInstructions[lastIndex]);
+                _ = builder.Append(')');
+            }
+
+            static void AppendTypeDefinition(StringBuilder builder, MetadataReader metadataReader, TypeDefinition typeDefinition)
+            {
+                AppendQualifiedName(builder, metadataReader, typeDefinition.Namespace, typeDefinition.Name);
+            }
+
+            static void AppendTypeReference(StringBuilder builder, MetadataReader metadataReader, TypeReference typeReference)
+            {
+                AppendQualifiedName(builder, metadataReader, typeReference.Namespace, typeReference.Name);
+            }
+
+            static void AppendTypeSpecification(StringBuilder builder, MetadataReader metadataReader, TypeSpecification typeSpecification)
+            {
+                Debug.WriteLine("TypeSpecifications are not supported.");
+                _ = builder.Append(typeSpecification);
             }
         }
     }
