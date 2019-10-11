@@ -87,20 +87,20 @@ namespace TerraFX.Optimization.CodeAnalysis
 
             var firstInstruction = FirstInstruction;
 
-            builder.Append("IL_");
+            _ = builder.Append("IL_");
             var offset = firstInstruction.GetOffset();
-            builder.Append(offset.ToString("X4"));
+            _ = builder.Append(offset.ToString("X4"));
 
             var lastInstruction = LastInstruction;
 
             if (lastInstruction != firstInstruction)
             {
-                builder.Append(',');
-                builder.Append(' ');
+                _ = builder.Append(',');
+                _ = builder.Append(' ');
 
-                builder.Append("IL_");
+                _ = builder.Append("IL_");
                 offset = lastInstruction.GetOffset();
-                builder.Append(offset.ToString("X4"));
+                _ = builder.Append(offset.ToString("X4"));
             }
 
             return builder.ToString();
@@ -115,7 +115,7 @@ namespace TerraFX.Optimization.CodeAnalysis
             var visitedBlocks = new HashSet<BasicBlock>();
             var pendingBlocks = new Queue<BasicBlock>();
 
-            visitedBlocks.Add(this);
+            _ = visitedBlocks.Add(this);
             pendingBlocks.Enqueue(this);
 
             do
@@ -127,7 +127,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                 {
                     if (visitedBlocks.Contains(child) == false)
                     {
-                        visitedBlocks.Add(child);
+                        _ = visitedBlocks.Add(child);
                         pendingBlocks.Enqueue(child);
                     }
                 }
@@ -144,7 +144,7 @@ namespace TerraFX.Optimization.CodeAnalysis
             var visitedBlocks = new HashSet<BasicBlock>();
             var pendingBlocks = new Queue<BasicBlock>();
 
-            visitedBlocks.Add(this);
+            _ = visitedBlocks.Add(this);
             pendingBlocks.Enqueue(this);
 
             do
@@ -156,7 +156,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                 {
                     if (visitedBlocks.Contains(child) == false)
                     {
-                        visitedBlocks.Add(child);
+                        _ = visitedBlocks.Add(child);
                         pendingBlocks.Enqueue(child);
                     }
                 }
@@ -173,7 +173,7 @@ namespace TerraFX.Optimization.CodeAnalysis
             var visitedBlocks = new HashSet<BasicBlock>();
             var pendingBlocks = new Stack<BasicBlock>();
 
-            visitedBlocks.Add(this);
+            _ = visitedBlocks.Add(this);
             pendingBlocks.Push(this);
 
             do
@@ -185,7 +185,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                 {
                     if (visitedBlocks.Contains(child) == false)
                     {
-                        visitedBlocks.Add(child);
+                        _ = visitedBlocks.Add(child);
                         pendingBlocks.Push(child);
                     }
                 }
@@ -202,7 +202,7 @@ namespace TerraFX.Optimization.CodeAnalysis
             var visitedBlocks = new HashSet<BasicBlock>();
             var pendingBlocks = new Stack<BasicBlock>();
 
-            visitedBlocks.Add(this);
+            _ = visitedBlocks.Add(this);
             pendingBlocks.Push(this);
 
             do
@@ -214,7 +214,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                 {
                     if (visitedBlocks.Contains(child) == false)
                     {
-                        visitedBlocks.Add(child);
+                        _ = visitedBlocks.Add(child);
                         pendingBlocks.Push(child);
                     }
                 }
