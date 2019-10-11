@@ -14,18 +14,18 @@
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);$(OS)</DefineConstants>
     <NoWarn>$(NoWarn);NU5105</NoWarn>
-    <PackageVersion Condition="'$(BUILD_BUILDNUMBER)' != ''">$(Version)-$(BUILD_BUILDNUMBER)</PackageVersion>
+    <PackageVersion Condition="'$(BUILD_BUILDNUMBER)' != ''">$(Version).$(BUILD_BUILDNUMBER)</PackageVersion>
   </PropertyGroup>
 
   <!-- Package versions for package references across all projects -->
   <ItemGroup>
-    <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.3.1-beta3-final" />
+    <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.3.1" />
     <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.3.0-preview-20190828-03" />
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" />
     <PackageReference Update="NUnit" Version="3.12.0" />
     <PackageReference Update="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Update="System.CommandLine.Experimental" Version="0.3.0-alpha.19405.1" />
-    <PackageReference Update="TerraFX.Utilities" Version="0.1.0-alpha-20190917.1" />
+    <PackageReference Update="TerraFX.Utilities" Version="0.1.0-alpha.20191011.2" />
   </ItemGroup>
 
 </Project>
