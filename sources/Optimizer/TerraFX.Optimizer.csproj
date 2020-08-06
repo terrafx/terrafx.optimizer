@@ -6,7 +6,7 @@
     <NoWarn>1591;$(NoWarn)</NoWarn>
     <OutputType>Exe</OutputType>
     <RootNamespace>TerraFX.Optimization</RootNamespace>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
