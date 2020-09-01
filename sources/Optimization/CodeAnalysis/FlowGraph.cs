@@ -2,9 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection.Metadata;
-using static TerraFX.Utilities.AssertionUtilities;
-using static TerraFX.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis
 {
@@ -24,8 +23,15 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public static FlowGraph Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
         {
-            ThrowIfNull(metadataReader, nameof(metadataReader));
-            ThrowIfNull(methodBody, nameof(methodBody));
+            if (metadataReader is null)
+            {
+                throw new ArgumentNullException(nameof(metadataReader));
+            }
+
+            if (methodBody is null)
+            {
+                throw new ArgumentNullException(nameof(methodBody));
+            }
 
             // This is essentially a depth-first traversal of the blocks that dynamically
             // adds the parents, children, and instructions during the traversal. We use
@@ -69,7 +75,7 @@ namespace TerraFX.Optimization.CodeAnalysis
             {
                 var currentBlock = pendingBlocks.Pop();
                 Instruction? instruction = currentBlock.FirstInstruction;
-                Assert(instruction != null, "Expected the first instruction to be not null.");
+                Debug.Assert(instruction != null, "Expected the first instruction to be not null.");
 
                 while (instruction != null)
                 {
@@ -84,7 +90,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                             // Unconditional branches specify the next instruction as their operand and
                             // will cause an unprocessed instruction to push a new block onto the stack.
 
-                            Assert(operandValue is Instruction, "Expected an instruction for the branch target.");
+                            Debug.Assert(operandValue is Instruction, "Expected an instruction for the branch target.");
 
                             var targetInstruction = (Instruction)operandValue!;
                             ProcessFirstInstructionForParent(currentBlock, targetInstruction, instructionMap, firstInstructionMap, pendingBlocks);
@@ -100,7 +106,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                             // Break, Call, and Next instructions just transfer control to the instruction
                             // at the next logical offset, they continue processing on the current block.
 
-                            Assert(nextInstruction != null, "Expected a next instruction.");
+                            Debug.Assert(nextInstruction != null, "Expected a next instruction.");
                             instruction = nextInstruction!;
 
                             if (firstInstructionMap.TryGetValue(instruction, out var childBlock))
@@ -120,7 +126,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                                 // adding it to the current block and returning true so that we can continue
                                 // processing the current sequence.
 
-                                Assert(currentBlock.Contains(instruction) == false, "Expected the basic block to not contain the target instruction.");
+                                Debug.Assert(currentBlock.Contains(instruction) == false, "Expected the basic block to not contain the target instruction.");
 
                                 currentBlock._lastInstruction = instruction;
                                 instructionMap.Add(instruction, currentBlock);
@@ -138,7 +144,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                                 // child blocks. We need to process each of the normal blocks plus the
                                 // instruction at the next logical offset.
 
-                                Assert(operandValue is IReadOnlyList<Instruction>, "Expected an immutable array of instructions for the branch targets.");
+                                Debug.Assert(operandValue is IReadOnlyList<Instruction>, "Expected an immutable array of instructions for the branch targets.");
                                 var targetInstructions = (IReadOnlyList<Instruction>)operandValue!;
 
                                 foreach (var targetInstruction in targetInstructions)
@@ -152,7 +158,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                                 // be the target instruction if the branch is taken and the other will
                                 // be the instruction at the next logical offset.
 
-                                Assert(operandValue is Instruction, "Expected an instruction for the branch target.");
+                                Debug.Assert(operandValue is Instruction, "Expected an instruction for the branch target.");
 
                                 var targetInstruction = (Instruction)operandValue!;
                                 ProcessFirstInstructionForParent(currentBlock, targetInstruction, instructionMap, firstInstructionMap, pendingBlocks);
@@ -163,7 +169,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                             // branch conditions are met. However, we want to add this as a child block and
                             // then do no further processing.
 
-                            Assert(nextInstruction != null, "Expected a next instruction.");
+                            Debug.Assert(nextInstruction != null, "Expected a next instruction.");
                             ProcessFirstInstructionForParent(currentBlock, nextInstruction!, instructionMap, firstInstructionMap, pendingBlocks);
 
                             nextInstruction = null;
@@ -230,7 +236,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                     // This is already the first instruction of a block, so we don't need
                     // to do anything and can just return.
 
-                    Assert(instructionMap.ContainsKey(firstInstruction), "Expected instruction to have been processed already.");
+                    Debug.Assert(instructionMap.ContainsKey(firstInstruction), "Expected instruction to have been processed already.");
                 }
                 else if (instructionMap.TryGetValue(firstInstruction, out childBlock!))
                 {
@@ -242,7 +248,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                     var targetBlock  = new BasicBlock(firstInstruction);
                     targetBlock._lastInstruction = childBlock._lastInstruction;
 
-                    Assert(firstInstruction.Previous != null, "");
+                    Debug.Assert(firstInstruction.Previous != null, "");
                     childBlock._lastInstruction = firstInstruction.Previous!;
 
                     firstInstructionMap.Add(firstInstruction, targetBlock);

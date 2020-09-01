@@ -5,8 +5,6 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Text;
-using TerraFX.Utilities;
-using static TerraFX.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis
 {
@@ -274,7 +272,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                 if (argumentOutOfRange)
                 {
-                    ThrowArgumentOutOfRangeException(nameof(value), value!);
+                    throw new ArgumentOutOfRangeException(nameof(value));
                 }
                 _value = value;
             }
@@ -394,8 +392,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                     default:
                     {
-                        ThrowInvalidOperationException(nameof(parent.Kind), parent.Kind);
-                        break;
+                        throw new ArgumentOutOfRangeException(nameof(parent.Kind));
                     }
                 }
 

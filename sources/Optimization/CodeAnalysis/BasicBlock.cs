@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
-using static TerraFX.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis
 {
@@ -18,7 +17,10 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         internal BasicBlock(Instruction firstInstruction)
         {
-            ThrowIfNull(firstInstruction, nameof(firstInstruction));
+            if (firstInstruction is null)
+            {
+                throw new ArgumentNullException(nameof(firstInstruction));
+            }
 
             _children = new HashSet<BasicBlock>();
             _parents = new HashSet<BasicBlock>();
