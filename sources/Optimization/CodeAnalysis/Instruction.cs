@@ -3,11 +3,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
-using static TerraFX.Utilities.AssertionUtilities;
-using static TerraFX.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis
 {
@@ -35,7 +34,10 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public static Instruction Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
         {
-            ThrowIfNull(methodBody, nameof(methodBody));
+            if (methodBody is null)
+            {
+                throw new ArgumentNullException(nameof(methodBody));
+            }
 
             var ilReader = methodBody.GetILReader();
             var rootInstruction = DecodeNext(metadataReader, ref ilReader);
@@ -68,7 +70,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                 {
                     case OperandKind.InlineBrTarget:
                     {
-                        Assert(operandValue is int, "Expected a 4-byte signed branch target.");
+                        Debug.Assert(operandValue is int, "Expected a 4-byte signed branch target.");
                         var targetOffset = offset + instruction.Length + (int)operandValue!;
                         operandValue = instructionMap[targetOffset];
                         break;
@@ -76,7 +78,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                     case OperandKind.InlineSwitch:
                     {
-                        Assert(operandValue is int[], "Expected an array of 4-byte signed branch targets.");
+                        Debug.Assert(operandValue is int[], "Expected an array of 4-byte signed branch targets.");
 
                         var targets = (int[])operandValue!;
                         var targetCount = targets.Length;
@@ -97,7 +99,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                     case OperandKind.ShortInlineBrTarget:
                     {
-                        Assert(operandValue is sbyte, "Expected a 1-byte signed branch target.");
+                        Debug.Assert(operandValue is sbyte, "Expected a 1-byte signed branch target.");
                         var targetOffset = offset + instruction.Length + (sbyte)operandValue!;
                         operandValue = instructionMap[targetOffset];
                         break;
