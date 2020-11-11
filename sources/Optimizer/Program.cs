@@ -18,7 +18,7 @@ namespace TerraFX.Optimization
         public static async Task<int> Main(params string[] args)
         {
             s_rootCommand.Description = "TerraFX IL Optimizer";
-            s_rootCommand.Handler = CommandHandler.Create(typeof(Program).GetMethod(nameof(Run)));
+            s_rootCommand.Handler = CommandHandler.Create(typeof(Program).GetMethod(nameof(Run))!);
 
             return await s_rootCommand.InvokeAsync(args);
         }
