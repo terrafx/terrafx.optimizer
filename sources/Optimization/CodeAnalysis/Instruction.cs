@@ -12,13 +12,15 @@ namespace TerraFX.Optimization.CodeAnalysis
 {
     public sealed class Instruction
     {
+        private readonly Opcode _opcode;
+
         private Instruction? _next;
         private Operand _operand;
         private Instruction? _previous;
 
         private Instruction(Opcode opcode, Operand operand)
         {
-            Opcode = opcode;
+            _opcode = opcode;
             _operand = operand;
         }
 
@@ -26,7 +28,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public int Length => Opcode.EncodingLength + Operand.Size;
 
-        public Opcode Opcode { get; }
+        public Opcode Opcode => _opcode;
 
         public Operand Operand => _operand;
 
@@ -42,10 +44,11 @@ namespace TerraFX.Optimization.CodeAnalysis
             var ilReader = methodBody.GetILReader();
             var rootInstruction = DecodeNext(metadataReader, ref ilReader);
 
-            var instructionMap = new Dictionary<int, Instruction>();
-            instructionMap.Add(0, rootInstruction);
+            var instructionMap = new Dictionary<int, Instruction> {
+                [0] = rootInstruction,
+            };
 
-            int currentOffset = rootInstruction.Length;
+            var currentOffset = rootInstruction.Length;
             var previousInstruction = rootInstruction;
 
             while (ilReader.RemainingBytes != 0)
@@ -61,8 +64,8 @@ namespace TerraFX.Optimization.CodeAnalysis
 
             foreach (var kvp in instructionMap)
             {
-                int offset = kvp.Key;
-                Instruction instruction = kvp.Value;
+                var offset = kvp.Key;
+                var instruction = kvp.Value;
 
                 var operandValue = instruction.Operand.Value;
 
@@ -86,7 +89,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                         var baseOffset = offset + instruction.Length;
                         var targetInstructions = ImmutableArray.CreateBuilder<Instruction>(targetCount);
 
-                        for (int i = 0; i < targets.Length; i++)
+                        for (var i = 0; i < targets.Length; i++)
                         {
                             var targetOffset = baseOffset + targets[i];
                             var targetInstruction = instructionMap[targetOffset];
@@ -184,7 +187,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                     var count = ilReader.ReadUInt32();
                     var targets = new int[count];
 
-                    for (int i = 0; i < count; i++)
+                    for (var i = 0; i < count; i++)
                     {
                         targets[i] = ilReader.ReadInt32();
                     }
@@ -215,7 +218,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                 default:
                 {
-                    throw new ArgumentOutOfRangeException(nameof(opcode.OperandKind));
+                    throw new NotSupportedException(nameof(opcode.OperandKind));
                 }
             }
 
@@ -225,7 +228,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public int GetIndex()
         {
-            int index = 0;
+            var index = 0;
             var previous = _previous;
 
             while (previous != null)
@@ -237,7 +240,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public int GetOffset()
         {
-            int offset = 0;
+            var offset = 0;
 
             for (var current = _previous; current != null; current = current.Previous)
             {

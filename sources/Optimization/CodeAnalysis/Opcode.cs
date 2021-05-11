@@ -341,8 +341,9 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public Operand CreateOperand(MetadataReader metadataReader, object? value)
         {
-            var operand = new Operand(metadataReader, OperandKind, value: null);
-            operand.Value = value;
+            var operand = new Operand(metadataReader, OperandKind, value: null) {
+                Value = value
+            };
             return operand;
         }
 

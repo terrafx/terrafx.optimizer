@@ -12,6 +12,7 @@ namespace TerraFX.Optimization.CodeAnalysis
     public sealed partial class BasicBlock
     {
         internal HashSet<BasicBlock> _children;
+        internal Instruction _firstInstruction;
         internal Instruction _lastInstruction;
         internal HashSet<BasicBlock> _parents;
 
@@ -25,13 +26,13 @@ namespace TerraFX.Optimization.CodeAnalysis
             _children = new HashSet<BasicBlock>();
             _parents = new HashSet<BasicBlock>();
 
-            FirstInstruction = firstInstruction;
+            _firstInstruction = firstInstruction;
             _lastInstruction = firstInstruction;
         }
 
         public IReadOnlyCollection<BasicBlock> Children => _children;
 
-        public Instruction FirstInstruction { get; }
+        public Instruction FirstInstruction => _firstInstruction;
 
         public Instruction LastInstruction => _lastInstruction;
 
@@ -46,7 +47,7 @@ namespace TerraFX.Optimization.CodeAnalysis
             // Determining if this block can reach the target block is a simple traversal
             // where we return true if the traversed block is ever the target block.
 
-            return TraverseDepthFirst((traversedBlock) => (traversedBlock == block)).Any();
+            return TraverseDepthFirst((traversedBlock) => traversedBlock == block).Any();
         }
 
         public bool Contains(Instruction instruction)
