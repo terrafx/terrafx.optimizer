@@ -65,16 +65,18 @@ namespace TerraFX.Optimization.CodeAnalysis
             var pendingBlocks = new Stack<BasicBlock>();
             pendingBlocks.Push(firstBlock);
 
-            var firstInstructionMap = new Dictionary<Instruction, BasicBlock>();
-            firstInstructionMap.Add(firstInstruction, firstBlock);
+            var firstInstructionMap = new Dictionary<Instruction, BasicBlock> {
+                [firstInstruction] = firstBlock,
+            };
 
-            var instructionMap = new Dictionary<Instruction, BasicBlock>();
-            instructionMap.Add(firstInstruction, firstBlock);
+            var instructionMap = new Dictionary<Instruction, BasicBlock> {
+                [firstInstruction] = firstBlock,
+            };
 
             while (pendingBlocks.Count != 0)
             {
                 var currentBlock = pendingBlocks.Pop();
-                Instruction? instruction = currentBlock.FirstInstruction;
+                var instruction = currentBlock.FirstInstruction;
                 Debug.Assert(instruction != null, "Expected the first instruction to be not null.");
 
                 while (instruction != null)
@@ -245,8 +247,9 @@ namespace TerraFX.Optimization.CodeAnalysis
                     // where it is the first instruction and insert it as a child of the
                     // existing block.
 
-                    var targetBlock  = new BasicBlock(firstInstruction);
-                    targetBlock._lastInstruction = childBlock._lastInstruction;
+                    var targetBlock = new BasicBlock(firstInstruction) {
+                        _lastInstruction = childBlock._lastInstruction
+                    };
 
                     Debug.Assert(firstInstruction.Previous != null, "");
                     childBlock._lastInstruction = firstInstruction.Previous!;

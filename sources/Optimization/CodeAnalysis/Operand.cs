@@ -10,18 +10,20 @@ namespace TerraFX.Optimization.CodeAnalysis
 {
     public struct Operand
     {
+        private readonly OperandKind _kind;
+        private readonly MetadataReader _metadataReader;
         private object? _value;
 
         internal Operand(MetadataReader metadataReader, OperandKind kind, object? value)
         {
-            Kind = kind;
-            MetadataReader = metadataReader;
+            _kind = kind;
+            _metadataReader = metadataReader;
             _value = value;
         }
 
-        public OperandKind Kind { get; }
+        public OperandKind Kind => _kind;
 
-        public MetadataReader MetadataReader { get; }
+        public MetadataReader MetadataReader => _metadataReader;
 
         public int Size
         {
@@ -92,7 +94,10 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public object? Value
         {
-            get => _value;
+            get
+            {
+                return _value;
+            }
 
             set
             {
@@ -266,7 +271,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                     default:
                     {
-                        throw new ArgumentOutOfRangeException(nameof(Kind));
+                        throw new NotSupportedException(nameof(Kind));
                     }
                 }
 
@@ -445,7 +450,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                 _ = builder.Append('(');
                 var lastIndex = targetInstructions.Length - 1;
 
-                for (int i = 0; i < lastIndex; i++)
+                for (var i = 0; i < lastIndex; i++)
                 {
                     AppendTargetInstruction(builder, targetInstructions[i]);
                     _ = builder.Append(',');

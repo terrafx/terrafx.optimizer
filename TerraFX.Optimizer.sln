@@ -57,15 +57,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerraFX.Optimization.UnitTe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{48E1F49D-7103-4DE6-9F69-915183B85095}"
 	ProjectSection(SolutionItems) = preProject
-		scripts\azure-ci.yml = scripts\azure-ci.yml
-		scripts\azure-pipelines.yml = scripts\azure-pipelines.yml
-		scripts\azure-pr.yml = scripts\azure-pr.yml
-		scripts\azure-unix.yml = scripts\azure-unix.yml
-		scripts\azure-windows.yml = scripts\azure-windows.yml
 		scripts\build.ps1 = scripts\build.ps1
 		scripts\build.sh = scripts\build.sh
 		scripts\cibuild.cmd = scripts\cibuild.cmd
 		scripts\cibuild.sh = scripts\cibuild.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{BC7BAD90-CD4D-40E6-BC1B-C31599D62F13}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{61C7F60A-6E36-4D78-A04E-559C3E9744B9}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug.md = .github\ISSUE_TEMPLATE\bug.md
+		.github\ISSUE_TEMPLATE\proposal.md = .github\ISSUE_TEMPLATE\proposal.md
+		.github\ISSUE_TEMPLATE\regression.md = .github\ISSUE_TEMPLATE\regression.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{6340E481-AFBA-4AEC-AAC0-3F3A1E0F4AB9}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
 	EndProjectSection
 EndProject
 Global
@@ -74,6 +83,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0EB1EAEB-6645-49C7-977F-8A93EEACE74E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0EB1EAEB-6645-49C7-977F-8A93EEACE74E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EB1EAEB-6645-49C7-977F-8A93EEACE74E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -82,21 +95,19 @@ Global
 		{9E8C6582-63D1-4A36-8E63-611A656E725E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E8C6582-63D1-4A36-8E63-611A656E725E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E8C6582-63D1-4A36-8E63-611A656E725E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{039611EC-89D5-4010-B732-7CF31B4CFA69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{49107E22-6DFB-4C57-A3D1-8F9C69D22406} = {0B821858-8E47-4485-AC06-D2E971A53EB2}
-		{77FBA110-86F8-4A94-8705-C31CC96673DD} = {EFB05081-EC44-49D3-B6D1-52AE42085B5B}
-		{0EB1EAEB-6645-49C7-977F-8A93EEACE74E} = {49107E22-6DFB-4C57-A3D1-8F9C69D22406}
-		{9E8C6582-63D1-4A36-8E63-611A656E725E} = {77FBA110-86F8-4A94-8705-C31CC96673DD}
 		{9EC8DCF1-639B-4C5F-AD99-77E30D51393C} = {0B821858-8E47-4485-AC06-D2E971A53EB2}
 		{039611EC-89D5-4010-B732-7CF31B4CFA69} = {9EC8DCF1-639B-4C5F-AD99-77E30D51393C}
+		{49107E22-6DFB-4C57-A3D1-8F9C69D22406} = {0B821858-8E47-4485-AC06-D2E971A53EB2}
+		{0EB1EAEB-6645-49C7-977F-8A93EEACE74E} = {49107E22-6DFB-4C57-A3D1-8F9C69D22406}
+		{77FBA110-86F8-4A94-8705-C31CC96673DD} = {EFB05081-EC44-49D3-B6D1-52AE42085B5B}
+		{9E8C6582-63D1-4A36-8E63-611A656E725E} = {77FBA110-86F8-4A94-8705-C31CC96673DD}
+		{61C7F60A-6E36-4D78-A04E-559C3E9744B9} = {BC7BAD90-CD4D-40E6-BC1B-C31599D62F13}
+		{6340E481-AFBA-4AEC-AAC0-3F3A1E0F4AB9} = {BC7BAD90-CD4D-40E6-BC1B-C31599D62F13}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2FE36DF8-2D9C-4F20-8787-45DC74B57461}

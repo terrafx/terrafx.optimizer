@@ -13,8 +13,9 @@ namespace TerraFX.Optimization
 {
     public static class Program
     {
-        private static RootCommand s_rootCommand = new RootCommand();
+        private static readonly RootCommand s_rootCommand = new RootCommand();
 
+#pragma warning disable IDE1006
         public static async Task<int> Main(params string[] args)
         {
             s_rootCommand.Description = "TerraFX IL Optimizer";
@@ -25,7 +26,7 @@ namespace TerraFX.Optimization
 
         public static int Run(InvocationContext context)
         {
-            int exitCode = 0;
+            var exitCode = 0;
 
             using var peStream = File.OpenRead("TerraFX.Optimization.dll");
             using var peReader = new PEReader(peStream);
@@ -48,7 +49,7 @@ namespace TerraFX.Optimization
                 var methodBody = peReader.GetMethodBody(methodDefinition.RelativeVirtualAddress);
                 var flowgraph = FlowGraph.Decode(metadataReader, methodBody);
 
-                for (int i = 0; i < flowgraph.Blocks.Count; i++)
+                for (var i = 0; i < flowgraph.Blocks.Count; i++)
                 {
                     Console.WriteLine($"  BB{i:X2}");
                     var block = flowgraph.Blocks[i];
