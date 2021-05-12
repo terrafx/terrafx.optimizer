@@ -8,11 +8,11 @@ using System.Reflection.Metadata;
 namespace TerraFX.Optimization.CodeAnalysis
 {
     /// <summary>Defines a flowgraph where each node defines a basic block of instructions.</summary>
-    public sealed class FlowGraph
+    public sealed class Flowgraph
     {
         private readonly List<BasicBlock> _blocks;
 
-        private FlowGraph(List<BasicBlock> blocks)
+        private Flowgraph(List<BasicBlock> blocks)
         {
             _blocks = blocks;
         }
@@ -21,7 +21,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public BasicBlock FirstBlock => Blocks[0];
 
-        public static FlowGraph Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
+        public static Flowgraph Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
         {
             if (metadataReader is null)
             {
@@ -219,7 +219,7 @@ namespace TerraFX.Optimization.CodeAnalysis
                 lastBlock = currentBlock;
             }
 
-            return new FlowGraph(blocks);
+            return new Flowgraph(blocks);
 
             static void ProcessFirstInstructionForParent(BasicBlock parentBlock, Instruction firstInstruction, Dictionary<Instruction, BasicBlock> instructionMap, Dictionary<Instruction, BasicBlock> firstInstructionMap, Stack<BasicBlock> pendingBlocks)
             {
@@ -284,7 +284,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
         public void TraverseBreadthFirst(Action<BasicBlock> action) => FirstBlock.TraverseBreadthFirst(action);
 
-        public IEnumerable<T> TravserBreadthFirst<T>(Func<BasicBlock, T> func) => FirstBlock.TraverseBreadthFirst(func);
+        public IEnumerable<T> TraverseBreadthFirst<T>(Func<BasicBlock, T> func) => FirstBlock.TraverseBreadthFirst(func);
 
         public void TraverseDepthFirst(Action<BasicBlock> action) => FirstBlock.TraverseDepthFirst(action);
 

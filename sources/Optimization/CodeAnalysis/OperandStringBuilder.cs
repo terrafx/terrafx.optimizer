@@ -159,7 +159,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                 default:
                 {
-                    throw new ArgumentOutOfRangeException(nameof(parent.Kind));
+                    throw new ArgumentOutOfRangeException(nameof(memberReference));
                 }
             }
 
@@ -186,7 +186,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                 default:
                 {
-                    throw new ArgumentOutOfRangeException(nameof(memberReference.GetKind));
+                    throw new ArgumentOutOfRangeException(nameof(memberReference));
                 }
             }
         }
@@ -251,7 +251,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                 default:
                 {
-                    throw new ArgumentOutOfRangeException(nameof(standaloneSignature.GetKind));
+                    throw new ArgumentOutOfRangeException(nameof(standaloneSignature));
                 }
             }
         }
@@ -423,7 +423,7 @@ namespace TerraFX.Optimization.CodeAnalysis
 
                 default:
                 {
-                    throw new ArgumentOutOfRangeException(nameof(signature.Header.CallingConvention));
+                    throw new ArgumentOutOfRangeException(nameof(signature));
                 }
             }
 

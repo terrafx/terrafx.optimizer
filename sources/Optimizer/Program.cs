@@ -25,7 +25,7 @@ namespace TerraFX.Optimization
             return await s_rootCommand.InvokeAsync(args);
         }
 
-        public static int Run(InvocationContext context)
+        public static int Run()
         {
             var exitCode = 0;
 
@@ -43,7 +43,7 @@ namespace TerraFX.Optimization
                 Console.WriteLine(builder);
 
                 var methodBody = peReader.GetMethodBody(methodDefinition.RelativeVirtualAddress);
-                var flowgraph = FlowGraph.Decode(metadataReader, methodBody);
+                var flowgraph = Flowgraph.Decode(metadataReader, methodBody);
 
                 for (var i = 0; i < flowgraph.Blocks.Count; i++)
                 {
