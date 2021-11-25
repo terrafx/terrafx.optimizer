@@ -6,7 +6,7 @@
     <NoWarn>1591;$(NoWarn)</NoWarn>
     <OutputType>Exe</OutputType>
     <RootNamespace>TerraFX.Optimization</RootNamespace>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
