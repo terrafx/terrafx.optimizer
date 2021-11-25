@@ -8,297 +8,296 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
-namespace TerraFX.Optimization.CodeAnalysis
+namespace TerraFX.Optimization.CodeAnalysis;
+
+public sealed class Instruction
 {
-    public sealed class Instruction
+    private readonly Opcode _opcode;
+
+    private Instruction? _next;
+    private Operand _operand;
+    private Instruction? _previous;
+
+    private Instruction(Opcode opcode, Operand operand)
     {
-        private readonly Opcode _opcode;
+        _opcode = opcode;
+        _operand = operand;
+    }
 
-        private Instruction? _next;
-        private Operand _operand;
-        private Instruction? _previous;
+    public Instruction? Next => _next;
 
-        private Instruction(Opcode opcode, Operand operand)
+    public int Length => Opcode.EncodingLength + Operand.Size;
+
+    public Opcode Opcode => _opcode;
+
+    public Operand Operand => _operand;
+
+    public Instruction? Previous => _previous;
+
+    public static Instruction Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
+    {
+        if (methodBody is null)
         {
-            _opcode = opcode;
-            _operand = operand;
+            throw new ArgumentNullException(nameof(methodBody));
         }
 
-        public Instruction? Next => _next;
+        var ilReader = methodBody.GetILReader();
+        var rootInstruction = DecodeNext(metadataReader, ref ilReader);
 
-        public int Length => Opcode.EncodingLength + Operand.Size;
+        var instructionMap = new Dictionary<int, Instruction> {
+            [0] = rootInstruction,
+        };
 
-        public Opcode Opcode => _opcode;
+        var currentOffset = rootInstruction.Length;
+        var previousInstruction = rootInstruction;
 
-        public Operand Operand => _operand;
-
-        public Instruction? Previous => _previous;
-
-        public static Instruction Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
+        while (ilReader.RemainingBytes != 0)
         {
-            if (methodBody is null)
-            {
-                throw new ArgumentNullException(nameof(methodBody));
-            }
+            var instruction = DecodeNext(metadataReader, ref ilReader);
+            instruction.InsertAfter(previousInstruction);
 
-            var ilReader = methodBody.GetILReader();
-            var rootInstruction = DecodeNext(metadataReader, ref ilReader);
+            instructionMap.Add(currentOffset, instruction);
+            currentOffset += instruction.Length;
 
-            var instructionMap = new Dictionary<int, Instruction> {
-                [0] = rootInstruction,
-            };
-
-            var currentOffset = rootInstruction.Length;
-            var previousInstruction = rootInstruction;
-
-            while (ilReader.RemainingBytes != 0)
-            {
-                var instruction = DecodeNext(metadataReader, ref ilReader);
-                instruction.InsertAfter(previousInstruction);
-
-                instructionMap.Add(currentOffset, instruction);
-                currentOffset += instruction.Length;
-
-                previousInstruction = instruction;
-            }
-
-            foreach (var kvp in instructionMap)
-            {
-                var offset = kvp.Key;
-                var instruction = kvp.Value;
-
-                var operandValue = instruction.Operand.Value;
-
-                switch (instruction.Operand.Kind)
-                {
-                    case OperandKind.InlineBrTarget:
-                    {
-                        Debug.Assert(operandValue is int, "Expected a 4-byte signed branch target.");
-                        var targetOffset = offset + instruction.Length + (int)operandValue!;
-                        operandValue = instructionMap[targetOffset];
-                        break;
-                    }
-
-                    case OperandKind.InlineSwitch:
-                    {
-                        Debug.Assert(operandValue is int[], "Expected an array of 4-byte signed branch targets.");
-
-                        var targets = (int[])operandValue!;
-                        var targetCount = targets.Length;
-
-                        var baseOffset = offset + instruction.Length;
-                        var targetInstructions = ImmutableArray.CreateBuilder<Instruction>(targetCount);
-
-                        for (var i = 0; i < targets.Length; i++)
-                        {
-                            var targetOffset = baseOffset + targets[i];
-                            var targetInstruction = instructionMap[targetOffset];
-                            targetInstructions.Add(targetInstruction);
-                        }
-
-                        operandValue = targetInstructions.ToImmutable();
-                        break;
-                    }
-
-                    case OperandKind.ShortInlineBrTarget:
-                    {
-                        Debug.Assert(operandValue is sbyte, "Expected a 1-byte signed branch target.");
-                        var targetOffset = offset + instruction.Length + (sbyte)operandValue!;
-                        operandValue = instructionMap[targetOffset];
-                        break;
-                    }
-                }
-
-                // This triggers the validation that the value is correct for the operand kind.
-                instruction._operand.Value = operandValue;
-            }
-
-            return rootInstruction;
+            previousInstruction = instruction;
         }
 
-        private static Instruction DecodeNext(MetadataReader metadataReader, ref BlobReader ilReader)
+        foreach (var kvp in instructionMap)
         {
-            int opcodeEncoding = ilReader.ReadByte();
+            var offset = kvp.Key;
+            var instruction = kvp.Value;
 
-            if (opcodeEncoding == 0xFE)
+            var operandValue = instruction.Operand.Value;
+
+            switch (instruction.Operand.Kind)
             {
-                opcodeEncoding <<= 8;
-                opcodeEncoding += ilReader.ReadByte();
-            }
-
-            var opcodeKind = (OpcodeKind)opcodeEncoding;
-            var opcode = Opcode.Create(opcodeKind);
-
-            var operandKind = opcode.OperandKind;
-            var operandValue = (object?)null;
-
-            switch (operandKind)
-            {
-                case OperandKind.InlineNone:
-                {
-                    break;
-                }
-
                 case OperandKind.InlineBrTarget:
-                case OperandKind.InlineI:
                 {
-                    operandValue = ilReader.ReadInt32();
-                    break;
-                }
-
-                case OperandKind.InlineField:
-                case OperandKind.InlineMethod:
-                case OperandKind.InlineTok:
-                case OperandKind.InlineType:
-                {
-                    var token = ilReader.ReadInt32();
-                    operandValue = MetadataTokens.EntityHandle(token);
-                    break;
-                }
-
-                case OperandKind.InlineI8:
-                {
-                    operandValue = ilReader.ReadInt64();
-                    break;
-                }
-
-                case OperandKind.InlineR:
-                {
-                    operandValue = ilReader.ReadDouble();
-                    break;
-                }
-
-                case OperandKind.InlineSig:
-                {
-                    var rowNumber = ilReader.ReadInt32();
-                    operandValue = MetadataTokens.StandaloneSignatureHandle(rowNumber);
-                    break;
-                }
-
-                case OperandKind.InlineString:
-                {
-                    var offset = ilReader.ReadInt32();
-                    operandValue = MetadataTokens.UserStringHandle(offset);
+                    Debug.Assert(operandValue is int, "Expected a 4-byte signed branch target.");
+                    var targetOffset = offset + instruction.Length + (int)operandValue!;
+                    operandValue = instructionMap[targetOffset];
                     break;
                 }
 
                 case OperandKind.InlineSwitch:
                 {
-                    var count = ilReader.ReadUInt32();
-                    var targets = new int[count];
+                    Debug.Assert(operandValue is int[], "Expected an array of 4-byte signed branch targets.");
 
-                    for (var i = 0; i < count; i++)
+                    var targets = (int[])operandValue!;
+                    var targetCount = targets.Length;
+
+                    var baseOffset = offset + instruction.Length;
+                    var targetInstructions = ImmutableArray.CreateBuilder<Instruction>(targetCount);
+
+                    for (var i = 0; i < targets.Length; i++)
                     {
-                        targets[i] = ilReader.ReadInt32();
+                        var targetOffset = baseOffset + targets[i];
+                        var targetInstruction = instructionMap[targetOffset];
+                        targetInstructions.Add(targetInstruction);
                     }
 
-                    operandValue = targets;
-                    break;
-                }
-
-                case OperandKind.InlineVar:
-                {
-                    operandValue = ilReader.ReadInt16();
+                    operandValue = targetInstructions.ToImmutable();
                     break;
                 }
 
                 case OperandKind.ShortInlineBrTarget:
-                case OperandKind.ShortInlineI:
-                case OperandKind.ShortInlineVar:
                 {
-                    operandValue = ilReader.ReadSByte();
+                    Debug.Assert(operandValue is sbyte, "Expected a 1-byte signed branch target.");
+                    var targetOffset = offset + instruction.Length + (sbyte)operandValue!;
+                    operandValue = instructionMap[targetOffset];
                     break;
                 }
+            }
 
-                case OperandKind.ShortInlineR:
+            // This triggers the validation that the value is correct for the operand kind.
+            instruction._operand.Value = operandValue;
+        }
+
+        return rootInstruction;
+    }
+
+    private static Instruction DecodeNext(MetadataReader metadataReader, ref BlobReader ilReader)
+    {
+        int opcodeEncoding = ilReader.ReadByte();
+
+        if (opcodeEncoding == 0xFE)
+        {
+            opcodeEncoding <<= 8;
+            opcodeEncoding += ilReader.ReadByte();
+        }
+
+        var opcodeKind = (OpcodeKind)opcodeEncoding;
+        var opcode = Opcode.Create(opcodeKind);
+
+        var operandKind = opcode.OperandKind;
+        var operandValue = (object?)null;
+
+        switch (operandKind)
+        {
+            case OperandKind.InlineNone:
+            {
+                break;
+            }
+
+            case OperandKind.InlineBrTarget:
+            case OperandKind.InlineI:
+            {
+                operandValue = ilReader.ReadInt32();
+                break;
+            }
+
+            case OperandKind.InlineField:
+            case OperandKind.InlineMethod:
+            case OperandKind.InlineTok:
+            case OperandKind.InlineType:
+            {
+                var token = ilReader.ReadInt32();
+                operandValue = MetadataTokens.EntityHandle(token);
+                break;
+            }
+
+            case OperandKind.InlineI8:
+            {
+                operandValue = ilReader.ReadInt64();
+                break;
+            }
+
+            case OperandKind.InlineR:
+            {
+                operandValue = ilReader.ReadDouble();
+                break;
+            }
+
+            case OperandKind.InlineSig:
+            {
+                var rowNumber = ilReader.ReadInt32();
+                operandValue = MetadataTokens.StandaloneSignatureHandle(rowNumber);
+                break;
+            }
+
+            case OperandKind.InlineString:
+            {
+                var offset = ilReader.ReadInt32();
+                operandValue = MetadataTokens.UserStringHandle(offset);
+                break;
+            }
+
+            case OperandKind.InlineSwitch:
+            {
+                var count = ilReader.ReadUInt32();
+                var targets = new int[count];
+
+                for (var i = 0; i < count; i++)
                 {
-                    operandValue = ilReader.ReadSingle();
-                    break;
+                    targets[i] = ilReader.ReadInt32();
                 }
 
-                default:
-                {
-                    throw new NotSupportedException(nameof(opcode.OperandKind));
-                }
+                operandValue = targets;
+                break;
             }
 
-            var operand = new Operand(metadataReader, operandKind, operandValue);
-            return new Instruction(opcode, operand);
-        }
-
-        public int GetIndex()
-        {
-            var index = 0;
-            var previous = _previous;
-
-            while (previous != null)
+            case OperandKind.InlineVar:
             {
-                index++;
+                operandValue = ilReader.ReadInt16();
+                break;
             }
-            return index;
-        }
 
-        public int GetOffset()
-        {
-            var offset = 0;
-
-            for (var current = _previous; current != null; current = current.Previous)
+            case OperandKind.ShortInlineBrTarget:
+            case OperandKind.ShortInlineI:
+            case OperandKind.ShortInlineVar:
             {
-                offset += current.Length;
-
+                operandValue = ilReader.ReadSByte();
+                break;
             }
-            return offset;
-        }
 
-        public void InsertAfter(Instruction instruction)
-        {
-            var next = instruction._next;
-
-            if (next != null)
+            case OperandKind.ShortInlineR:
             {
-                next._previous = this;
-                _next = next;
+                operandValue = ilReader.ReadSingle();
+                break;
             }
-            instruction._next = this;
-            _previous = instruction;
-        }
 
-        public void InsertBefore(Instruction instruction)
-        {
-            var previous = instruction._previous;
-
-            if (previous != null)
+            default:
             {
-                previous._next = this;
-                _previous = previous;
+                throw new NotSupportedException(nameof(opcode.OperandKind));
             }
-            instruction._previous = this;
-            _next = instruction;
         }
 
-        public override string ToString()
+        var operand = new Operand(metadataReader, operandKind, operandValue);
+        return new Instruction(opcode, operand);
+    }
+
+    public int GetIndex()
+    {
+        var index = 0;
+        var previous = _previous;
+
+        while (previous != null)
         {
-            var builder = new StringBuilder();
-
-            _ = builder.Append("IL_");
-            var offset = GetOffset();
-            _ = builder.Append(offset.ToString("X4"));
-
-            _ = builder.Append(':');
-            _ = builder.Append(' ', 2);
-
-            var opcodeName = Opcode.Name;
-            _ = builder.Append(opcodeName);
-
-            var operand = Operand.ToString();
-
-            if (operand != string.Empty)
-            {
-                _ = builder.Append(' ', 16 - opcodeName.Length);
-                _ = builder.Append(operand);
-            }
-
-            return builder.ToString();
+            index++;
         }
+        return index;
+    }
+
+    public int GetOffset()
+    {
+        var offset = 0;
+
+        for (var current = _previous; current != null; current = current.Previous)
+        {
+            offset += current.Length;
+
+        }
+        return offset;
+    }
+
+    public void InsertAfter(Instruction instruction)
+    {
+        var next = instruction._next;
+
+        if (next != null)
+        {
+            next._previous = this;
+            _next = next;
+        }
+        instruction._next = this;
+        _previous = instruction;
+    }
+
+    public void InsertBefore(Instruction instruction)
+    {
+        var previous = instruction._previous;
+
+        if (previous != null)
+        {
+            previous._next = this;
+            _previous = previous;
+        }
+        instruction._previous = this;
+        _next = instruction;
+    }
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+
+        _ = builder.Append("IL_");
+        var offset = GetOffset();
+        _ = builder.Append(offset.ToString("X4"));
+
+        _ = builder.Append(':');
+        _ = builder.Append(' ', 2);
+
+        var opcodeName = Opcode.Name;
+        _ = builder.Append(opcodeName);
+
+        var operand = Operand.ToString();
+
+        if (operand != string.Empty)
+        {
+            _ = builder.Append(' ', 16 - opcodeName.Length);
+            _ = builder.Append(operand);
+        }
+
+        return builder.ToString();
     }
 }

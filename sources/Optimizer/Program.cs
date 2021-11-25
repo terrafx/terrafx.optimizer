@@ -10,58 +10,57 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraFX.Optimization.CodeAnalysis;
 
-namespace TerraFX.Optimization
+namespace TerraFX.Optimization;
+
+public static class Program
 {
-    public static class Program
-    {
-        private static readonly RootCommand s_rootCommand = new RootCommand();
+    private static readonly RootCommand s_rootCommand = new RootCommand();
 
 #pragma warning disable IDE1006
-        public static async Task<int> Main(params string[] args)
+    public static async Task<int> Main(params string[] args)
+    {
+        s_rootCommand.Description = "TerraFX IL Optimizer";
+        s_rootCommand.Handler = CommandHandler.Create(typeof(Program).GetMethod(nameof(Run))!);
+
+        return await s_rootCommand.InvokeAsync(args);
+    }
+
+    public static int Run()
+    {
+        var exitCode = 0;
+
+        using var peStream = File.OpenRead("TerraFX.Optimization.dll");
+        using var peReader = new PEReader(peStream);
+
+        var metadataReader = peReader.GetMetadataReader();
+
+        foreach (var methodDefinitionHandle in metadataReader.MethodDefinitions)
         {
-            s_rootCommand.Description = "TerraFX IL Optimizer";
-            s_rootCommand.Handler = CommandHandler.Create(typeof(Program).GetMethod(nameof(Run))!);
+            var methodDefinition = metadataReader.GetMethodDefinition(methodDefinitionHandle);
 
-            return await s_rootCommand.InvokeAsync(args);
-        }
+            var builder = new StringBuilder();
+            OperandStringBuilder.AppendMethodDefinition(builder, metadataReader, methodDefinition);
+            Console.WriteLine(builder);
 
-        public static int Run(InvocationContext context)
-        {
-            var exitCode = 0;
+            var methodBody = peReader.GetMethodBody(methodDefinition.RelativeVirtualAddress);
+            var flowgraph = Flowgraph.Decode(metadataReader, methodBody);
 
-            using var peStream = File.OpenRead("TerraFX.Optimization.dll");
-            using var peReader = new PEReader(peStream);
-
-            var metadataReader = peReader.GetMetadataReader();
-
-            foreach (var methodDefinitionHandle in metadataReader.MethodDefinitions)
+            for (var i = 0; i < flowgraph.Blocks.Count; i++)
             {
-                var methodDefinition = metadataReader.GetMethodDefinition(methodDefinitionHandle);
+                Console.WriteLine($"  // BB{i:X2}");
+                var block = flowgraph.Blocks[i];
 
-                var builder = new StringBuilder();
-                OperandStringBuilder.AppendMethodDefinition(builder, metadataReader, methodDefinition);
-                Console.WriteLine(builder);
-
-                var methodBody = peReader.GetMethodBody(methodDefinition.RelativeVirtualAddress);
-                var flowgraph = FlowGraph.Decode(metadataReader, methodBody);
-
-                for (var i = 0; i < flowgraph.Blocks.Count; i++)
+                for (var instruction = block.FirstInstruction; instruction != block.LastInstruction; instruction = instruction.Next!)
                 {
-                    Console.WriteLine($"  // BB{i:X2}");
-                    var block = flowgraph.Blocks[i];
-                    
-                    for (var instruction = block.FirstInstruction; instruction != block.LastInstruction; instruction = instruction.Next!)
-                    {
-                        Console.Write("    ");
-                        Console.WriteLine(instruction);
-                    }
-
                     Console.Write("    ");
-                    Console.WriteLine(block.LastInstruction);
+                    Console.WriteLine(instruction);
                 }
-            }
 
-            return exitCode;
+                Console.Write("    ");
+                Console.WriteLine(block.LastInstruction);
+            }
         }
+
+        return exitCode;
     }
 }
