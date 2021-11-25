@@ -214,7 +214,7 @@ public struct OperandStringBuilder : ISignatureTypeProvider<string, object?>
     public static void AppendOffset(StringBuilder builder, Instruction instruction)
     {
         _ = builder.Append("IL_");
-        var offset = instruction.GetOffset();
+        var offset = instruction.Offset;
         _ = builder.Append(offset.ToString("X4"));
     }
 

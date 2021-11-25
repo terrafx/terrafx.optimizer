@@ -53,10 +53,10 @@ public static class Program
             var methodBody = peReader.GetMethodBody(methodDefinition.RelativeVirtualAddress);
             var flowgraph = Flowgraph.Decode(metadataReader, methodBody);
 
-            for (var i = 0; i < flowgraph.Blocks.Count; i++)
+            var i = 0;
+            foreach (var block in flowgraph.Blocks)
             {
                 Console.WriteLine($"  // BB{i:X2}");
-                var block = flowgraph.Blocks[i];
 
                 for (var instruction = block.FirstInstruction; instruction != block.LastInstruction; instruction = instruction.Next!)
                 {
@@ -66,6 +66,8 @@ public static class Program
 
                 Console.Write("    ");
                 Console.WriteLine(block.LastInstruction);
+
+                i++;
             }
         }
     }

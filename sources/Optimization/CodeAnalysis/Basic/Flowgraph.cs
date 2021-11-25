@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection.Metadata;
 
 namespace TerraFX.Optimization.CodeAnalysis;
@@ -10,16 +11,19 @@ namespace TerraFX.Optimization.CodeAnalysis;
 /// <summary>Defines a flowgraph where each node defines a basic block of instructions.</summary>
 public sealed class Flowgraph
 {
-    private readonly List<BasicBlock> _blocks;
+    private readonly SortedSet<BasicBlock> _blocks;
+    private bool _isReadOnly;
 
-    private Flowgraph(List<BasicBlock> blocks)
+    public Flowgraph()
     {
-        _blocks = blocks;
+        _blocks = new SortedSet<BasicBlock>();
     }
 
-    public IReadOnlyList<BasicBlock> Blocks => _blocks;
+    public IReadOnlySet<BasicBlock> Blocks => _blocks;
 
-    public BasicBlock FirstBlock => Blocks[0];
+    public BasicBlock FirstBlock => Blocks.First();
+
+    public bool IsReadOnly => _isReadOnly;
 
     public static Flowgraph Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
     {
@@ -65,11 +69,11 @@ public sealed class Flowgraph
         var pendingBlocks = new Stack<BasicBlock>();
         pendingBlocks.Push(firstBlock);
 
-        var firstInstructionMap = new Dictionary<Instruction, BasicBlock> {
+        var firstInstructionMap = new SortedDictionary<Instruction, BasicBlock>() {
             [firstInstruction] = firstBlock,
         };
 
-        var instructionMap = new Dictionary<Instruction, BasicBlock> {
+        var instructionMap = new SortedDictionary<Instruction, BasicBlock>() {
             [firstInstruction] = firstBlock,
         };
 
@@ -77,9 +81,10 @@ public sealed class Flowgraph
         {
             var currentBlock = pendingBlocks.Pop();
             var instruction = currentBlock.FirstInstruction;
-            Debug.Assert(instruction != null, "Expected the first instruction to be not null.");
 
-            while (instruction != null)
+            Debug.Assert(instruction is not null, "Expected the first instruction to be not null.");
+
+            while (instruction is not null)
             {
                 var nextInstruction = instruction.Next;
                 var opcode = instruction.Opcode;
@@ -108,7 +113,7 @@ public sealed class Flowgraph
                         // Break, Call, and Next instructions just transfer control to the instruction
                         // at the next logical offset, they continue processing on the current block.
 
-                        Debug.Assert(nextInstruction != null, "Expected a next instruction.");
+                        Debug.Assert(nextInstruction is not null, "Expected a next instruction.");
                         instruction = nextInstruction!;
 
                         if (firstInstructionMap.TryGetValue(instruction, out var childBlock))
@@ -117,8 +122,8 @@ public sealed class Flowgraph
                             // to add the existing block as a child of the current block and return
                             // false so that we stop processing this sequence.
 
-                            _ = currentBlock._children.Add(childBlock);
-                            _ = childBlock._parents.Add(currentBlock);
+                            currentBlock.AddChild(childBlock);
+                            childBlock.AddParent(currentBlock);
 
                             instruction = null;
                         }
@@ -130,7 +135,7 @@ public sealed class Flowgraph
 
                             Debug.Assert(currentBlock.Contains(instruction) == false, "Expected the basic block to not contain the target instruction.");
 
-                            currentBlock._lastInstruction = instruction;
+                            currentBlock.LastInstruction = instruction;
                             instructionMap.Add(instruction, currentBlock);
                         }
 
@@ -171,7 +176,7 @@ public sealed class Flowgraph
                         // branch conditions are met. However, we want to add this as a child block and
                         // then do no further processing.
 
-                        Debug.Assert(nextInstruction != null, "Expected a next instruction.");
+                        Debug.Assert(nextInstruction is not null, "Expected a next instruction.");
                         ProcessFirstInstructionForParent(currentBlock, nextInstruction!, instructionMap, firstInstructionMap, pendingBlocks);
 
                         nextInstruction = null;
@@ -196,7 +201,7 @@ public sealed class Flowgraph
                     }
                 }
 
-                if (nextInstruction != null)
+                if (nextInstruction is not null)
                 {
                     // Ensure the next instruction has already been processed or is part of the pending
                     // block list so that we can properly track dead/dangling code for later cleanup.
@@ -205,31 +210,26 @@ public sealed class Flowgraph
             }
         }
 
-        var blocks = new List<BasicBlock>();
-        BasicBlock? lastBlock = null;
+        var flowgraph = new Flowgraph();
 
-        for (var currentInstruction = firstInstruction; currentInstruction != null; currentInstruction = currentInstruction.Next!)
+        foreach (var block in firstInstructionMap.Values)
         {
-            var currentBlock = instructionMap[currentInstruction];
-
-            if (currentBlock != lastBlock)
-            {
-                blocks.Add(currentBlock);
-            }
-            lastBlock = currentBlock;
+            block.Freeze();
+            flowgraph.AddBlock(block);
         }
 
-        return new Flowgraph(blocks);
+        flowgraph.Freeze();
+        return flowgraph;
 
-        static void ProcessFirstInstructionForParent(BasicBlock parentBlock, Instruction firstInstruction, Dictionary<Instruction, BasicBlock> instructionMap, Dictionary<Instruction, BasicBlock> firstInstructionMap, Stack<BasicBlock> pendingBlocks)
+        static void ProcessFirstInstructionForParent(BasicBlock parentBlock, Instruction firstInstruction, SortedDictionary<Instruction, BasicBlock> instructionMap, SortedDictionary<Instruction, BasicBlock> firstInstructionMap, Stack<BasicBlock> pendingBlocks)
         {
             var childBlock = ProcessFirstInstruction(firstInstruction, instructionMap, firstInstructionMap, pendingBlocks);
 
-            _ = parentBlock._children.Add(childBlock);
-            _ = childBlock._parents.Add(parentBlock);
+            parentBlock.AddChild(childBlock);
+            childBlock.AddParent(parentBlock);
         }
 
-        static BasicBlock ProcessFirstInstruction(Instruction firstInstruction, Dictionary<Instruction, BasicBlock> instructionMap, Dictionary<Instruction, BasicBlock> firstInstructionMap, Stack<BasicBlock> pendingBlocks)
+        static BasicBlock ProcessFirstInstruction(Instruction firstInstruction, SortedDictionary<Instruction, BasicBlock> instructionMap, SortedDictionary<Instruction, BasicBlock> firstInstructionMap, Stack<BasicBlock> pendingBlocks)
         {
             BasicBlock childBlock;
 
@@ -248,19 +248,19 @@ public sealed class Flowgraph
                 // existing block.
 
                 var targetBlock = new BasicBlock(firstInstruction) {
-                    _lastInstruction = childBlock._lastInstruction
+                    LastInstruction = childBlock.LastInstruction
                 };
 
-                Debug.Assert(firstInstruction.Previous != null, "");
-                childBlock._lastInstruction = firstInstruction.Previous!;
+                Debug.Assert(firstInstruction.Previous is not null, "");
+                childBlock.LastInstruction = firstInstruction.Previous!;
 
                 firstInstructionMap.Add(firstInstruction, targetBlock);
 
-                targetBlock._children = childBlock._children;
-                childBlock._children = new HashSet<BasicBlock>();
+                targetBlock.AddChildren(childBlock.Children);
+                childBlock.ClearChildren();
 
-                _ = childBlock._children.Add(targetBlock);
-                _ = targetBlock._parents.Add(childBlock);
+                childBlock.AddChild(targetBlock);
+                targetBlock.AddParent(childBlock);
             }
             else
             {
@@ -278,6 +278,20 @@ public sealed class Flowgraph
 
             return childBlock;
         }
+    }
+
+    public void AddBlock(BasicBlock block)
+    {
+        if (IsReadOnly)
+        {
+            throw new InvalidOperationException();
+        }
+        _ = _blocks.Add(block);
+    }
+
+    public void Freeze()
+    {
+        _isReadOnly = true;
     }
 
     public bool IsReachable(BasicBlock block) => FirstBlock.CanReach(block);

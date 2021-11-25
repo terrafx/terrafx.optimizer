@@ -106,7 +106,7 @@ public struct Operand
             {
                 case OperandKind.InlineNone:
                 {
-                    argumentOutOfRange = value != null;
+                    argumentOutOfRange = value is not null;
                     break;
                 }
 
