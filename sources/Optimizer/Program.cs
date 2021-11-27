@@ -4,10 +4,10 @@ using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
-using System.Text;
 using System.Threading.Tasks;
 using TerraFX.Optimization.CodeAnalysis;
 
@@ -44,13 +44,19 @@ public static class Program
 
         foreach (var methodDefinitionHandle in metadataReader.MethodDefinitions)
         {
-            var methodDefinition = metadataReader.GetMethodDefinition(methodDefinitionHandle);
+            var methodDefinitionInfo = CompilerInfo.Instance.Resolve(methodDefinitionHandle, metadataReader);
+            Debug.Assert(methodDefinitionInfo is not null);
 
-            var builder = new StringBuilder();
-            OperandStringBuilder.AppendMethodDefinition(builder, metadataReader, methodDefinition);
-            Console.WriteLine(builder);
+            var relativeVirtualAddress = methodDefinitionInfo.RelativeVirtualAddress;
 
-            var methodBody = peReader.GetMethodBody(methodDefinition.RelativeVirtualAddress);
+            if (relativeVirtualAddress == 0)
+            {
+                continue;
+            }
+
+            Console.WriteLine(methodDefinitionInfo);
+
+            var methodBody = peReader.GetMethodBody(relativeVirtualAddress);
             var flowgraph = Flowgraph.Decode(metadataReader, methodBody);
 
             var i = 0;

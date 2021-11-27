@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Text;
 
@@ -123,19 +124,17 @@ public struct Operand
                     {
                         if (entityHandle.Kind == HandleKind.MemberReference)
                         {
-                            var memberReferenceHandle = (MemberReferenceHandle)entityHandle;
-                            var memberReference = MetadataReader.GetMemberReference(memberReferenceHandle);
+                            var memberReferenceInfo = CompilerInfo.Instance.Resolve((MemberReferenceHandle)entityHandle, MetadataReader);
 
-                            if (memberReference.GetKind() == MemberReferenceKind.Field)
+                            if (memberReferenceInfo is FieldReferenceInfo fieldReferenceInfo)
                             {
-                                value = memberReference;
+                                value = fieldReferenceInfo;
                                 argumentOutOfRange = false;
                             }
                         }
                         else if (entityHandle.Kind == HandleKind.FieldDefinition)
                         {
-                            var fieldDefinitionHandle = (FieldDefinitionHandle)entityHandle;
-                            value = MetadataReader.GetFieldDefinition(fieldDefinitionHandle);
+                            value = CompilerInfo.Instance.Resolve((FieldDefinitionHandle)entityHandle, MetadataReader);
                             argumentOutOfRange = false;
                         }
                     }
@@ -144,12 +143,20 @@ public struct Operand
 
                 case OperandKind.InlineI:
                 {
+                    if (value?.GetType() == typeof(uint))
+                    {
+                        value = (int)(uint)value;
+                    }
                     argumentOutOfRange = value?.GetType() != typeof(int);
                     break;
                 }
 
                 case OperandKind.InlineI8:
                 {
+                    if (value?.GetType() == typeof(ulong))
+                    {
+                        value = (long)(ulong)value;
+                    }
                     argumentOutOfRange = value?.GetType() != typeof(long);
                     break;
                 }
@@ -160,25 +167,22 @@ public struct Operand
                     {
                         if (entityHandle.Kind == HandleKind.MemberReference)
                         {
-                            var memberReferenceHandle = (MemberReferenceHandle)entityHandle;
-                            var memberReference = MetadataReader.GetMemberReference(memberReferenceHandle);
+                            var memberReferenceInfo = CompilerInfo.Instance.Resolve((MemberReferenceHandle)entityHandle, MetadataReader);
 
-                            if (memberReference.GetKind() == MemberReferenceKind.Method)
+                            if (memberReferenceInfo is MethodReferenceInfo methodReferenceInfo)
                             {
-                                value = memberReference;
+                                value = methodReferenceInfo;
                                 argumentOutOfRange = false;
                             }
                         }
                         else if (entityHandle.Kind == HandleKind.MethodDefinition)
                         {
-                            var methodDefinitionHandle = (MethodDefinitionHandle)entityHandle;
-                            value = MetadataReader.GetMethodDefinition(methodDefinitionHandle);
+                            value = CompilerInfo.Instance.Resolve((MethodDefinitionHandle)entityHandle, MetadataReader);
                             argumentOutOfRange = false;
                         }
                         else if (entityHandle.Kind == HandleKind.MethodSpecification)
                         {
-                            var methodSpecificationHandle = (MethodSpecificationHandle)entityHandle;
-                            value = MetadataReader.GetMethodSpecification(methodSpecificationHandle);
+                            value = CompilerInfo.Instance.Resolve((MethodSpecificationHandle)entityHandle, MetadataReader);
                             argumentOutOfRange = false;
                         }
                     }
@@ -195,7 +199,7 @@ public struct Operand
                 {
                     if (value is StandaloneSignatureHandle standaloneSignatureHandle)
                     {
-                        value = MetadataReader.GetStandaloneSignature(standaloneSignatureHandle);
+                        value = CompilerInfo.Instance.Resolve(standaloneSignatureHandle, MetadataReader);
                         argumentOutOfRange = false;
                     }
                     break;
@@ -205,7 +209,8 @@ public struct Operand
                 {
                     if (value is UserStringHandle userStringHandle)
                     {
-                        value = MetadataReader.GetUserString(userStringHandle);
+                        var userString = MetadataReader.GetUserString(userStringHandle);
+                        value = userString;
                         argumentOutOfRange = false;
                     }
                     break;
@@ -219,7 +224,11 @@ public struct Operand
 
                 case OperandKind.InlineTok:
                 {
-                    argumentOutOfRange = value?.GetType() != typeof(EntityHandle);
+                    if (value is EntityHandle entityHandle)
+                    {
+                        value = CompilerInfo.Instance.Resolve(entityHandle, MetadataReader);
+                        argumentOutOfRange = false;
+                    }
                     break;
                 }
 
@@ -229,20 +238,17 @@ public struct Operand
                     {
                         if (entityHandle.Kind == HandleKind.TypeDefinition)
                         {
-                            var typeDefinitionHandle = (TypeDefinitionHandle)entityHandle;
-                            value = MetadataReader.GetTypeDefinition(typeDefinitionHandle);
+                            value = CompilerInfo.Instance.Resolve((TypeDefinitionHandle)entityHandle, MetadataReader);
                             argumentOutOfRange = false;
                         }
                         else if (entityHandle.Kind == HandleKind.TypeReference)
                         {
-                            var typeReferenceHandle = (TypeReferenceHandle)entityHandle;
-                            value = MetadataReader.GetTypeReference(typeReferenceHandle);
+                            value = CompilerInfo.Instance.Resolve((TypeReferenceHandle)entityHandle, MetadataReader);
                             argumentOutOfRange = false;
                         }
                         else if (entityHandle.Kind == HandleKind.TypeSpecification)
                         {
-                            var typeSpecificationHandle = (TypeSpecificationHandle)entityHandle;
-                            value = MetadataReader.GetTypeSpecification(typeSpecificationHandle);
+                            value = CompilerInfo.Instance.Resolve((TypeSpecificationHandle)entityHandle, MetadataReader);
                             argumentOutOfRange = false;
                         }
                     }
@@ -251,6 +257,10 @@ public struct Operand
 
                 case OperandKind.InlineVar:
                 {
+                    if (value?.GetType() == typeof(ushort))
+                    {
+                        value = (short)(ushort)value;
+                    }
                     argumentOutOfRange = value?.GetType() != typeof(short);
                     break;
                 }
@@ -258,6 +268,10 @@ public struct Operand
                 case OperandKind.ShortInlineI:
                 case OperandKind.ShortInlineVar:
                 {
+                    if (value?.GetType() == typeof(byte))
+                    {
+                        value = (sbyte)(byte)value;
+                    }
                     argumentOutOfRange = value?.GetType() != typeof(sbyte);
                     break;
                 }
@@ -282,9 +296,55 @@ public struct Operand
         }
     }
 
+    public double AsDouble() => (double)Value!;
+
+    public FieldDefinitionInfo AsFieldDefinitionInfo() => (FieldDefinitionInfo)Value!;
+    
+    public Instruction AsInstruction() => (Instruction)Value!;
+
+    public ImmutableArray<Instruction> AsInstructions() => (ImmutableArray<Instruction>)Value!;
+
+    public sbyte AsInt8() => (sbyte)Value!;
+
+    public short AsInt16() => (short)Value!;
+
+    public int AsInt32() => (int)Value!;
+
+    public long AsInt64() => (long)Value!;
+
+    public MemberReferenceInfo AsMemberReferenceInfo() => (MemberReferenceInfo)Value!;
+
+    public MetadataInfo AsMetadataInfo() => (MetadataInfo)Value!;
+
+    public MethodDefinitionInfo AsMethodDefinitionInfo() => (MethodDefinitionInfo)Value!;
+
+    public MethodSpecificationInfo AsMethodSpecificationInfo() => (MethodSpecificationInfo)Value!;
+
+    public float AsSingle() => (float)Value!;
+
+    public StandaloneSignatureInfo AsStandaloneSignatureInfo() => (StandaloneSignatureInfo)Value!;
+
+    public string AsString() => (string)Value!;
+
+    public TypeDefinitionInfo AsTypeDefinitionInfo() => (TypeDefinitionInfo)Value!;
+
+    public TypeReferenceInfo AsTypeReferenceInfo() => (TypeReferenceInfo)Value!;
+
+    public TypeSpecificationInfo AsTypeSpecificationInfo() => (TypeSpecificationInfo)Value!;
+
+    public byte AsUInt8() => (byte)(sbyte)Value!;
+
+    public ushort AsUInt16() => (ushort)(short)Value!;
+
+    public uint AsUInt32() => (uint)(int)Value!;
+
+    public ulong AsUInt64() => (ulong)(long)Value!;
+
     public override string ToString()
     {
-        if (_value is not object value)
+        var value = _value;
+
+        if (_value is null)
         {
             return string.Empty;
         }
@@ -293,51 +353,97 @@ public struct Operand
 
         if (value is Instruction targetInstruction)
         {
-            OperandStringBuilder.AppendTargetInstruction(builder, targetInstruction);
+            _ = AppendOffset(builder, targetInstruction);
         }
         else if (value is ImmutableArray<Instruction> targetInstructions)
         {
-            OperandStringBuilder.AppendTargetInstructions(builder, targetInstructions);
+            _ = builder.Append('(');
+            var lastIndex = targetInstructions.Length - 1;
+
+            for (var i = 0; i < lastIndex; i++)
+            {
+                _ = AppendOffset(builder, targetInstructions[i]);
+                _ = builder.Append(',');
+                _ = builder.Append(' ');
+            }
+
+            _ = AppendOffset(builder, targetInstructions[lastIndex]);
+            _ = builder.Append(')');
         }
-        else if (value is FieldDefinition fieldDefinition)
+        else if (value is FieldDefinitionInfo fieldDefinitionInfo)
         {
-            OperandStringBuilder.AppendFieldDefinition(builder, MetadataReader, fieldDefinition);
+            _ = builder.Append(fieldDefinitionInfo);
         }
-        else if (value is MethodDefinition methodDefinition)
+        else if (value is MethodDefinitionInfo methodDefinitionInfo)
         {
-            OperandStringBuilder.AppendMethodDefinition(builder, MetadataReader, methodDefinition);
+            _ = builder.Append(methodDefinitionInfo);
         }
-        else if (value is MemberReference memberReference)
+        else if (value is MemberReferenceInfo memberReferenceInfo)
         {
-            OperandStringBuilder.AppendMemberReference(builder, MetadataReader, memberReference);
+            _ = builder.Append(memberReferenceInfo);
         }
-        else if (value is StandaloneSignature standaloneSignature)
+        else if (value is MethodSpecificationInfo methodSpecificationInfo)
         {
-            OperandStringBuilder.AppendStandaloneSignature(builder, MetadataReader, standaloneSignature);
+            _ = builder.Append(methodSpecificationInfo);
         }
-        else if (value is TypeDefinition typeDefinition)
+        else if (value is StandaloneSignatureInfo standaloneSignatureInfo)
         {
-            OperandStringBuilder.AppendTypeDefinition(builder, MetadataReader, typeDefinition);
+            _ = builder.Append(standaloneSignatureInfo);
         }
-        else if (value is TypeReference typeReference)
+        else if (value is TypeDefinitionInfo typeDefinitionInfo)
         {
-            OperandStringBuilder.AppendTypeReference(builder, MetadataReader, typeReference);
+            _ = builder.Append(typeDefinitionInfo);
         }
-        else if (value is TypeSpecification typeSpecification)
+        else if (value is TypeReferenceInfo typeReferenceInfo)
         {
-            OperandStringBuilder.AppendTypeSpecification(builder, typeSpecification);
+            _ = builder.Append(typeReferenceInfo);
         }
-        else if (value is string)
+        else if (value is TypeSpecificationInfo typeSpecificationInfo)
+        {
+            _ = builder.Append(typeSpecificationInfo);
+        }
+        else if (value is float float32Value)
+        {
+            _ = builder.Append(float32Value);
+        }
+        else if (value is double float64Value)
+        {
+            _ = builder.Append(float64Value);
+        }
+        else if (value is sbyte int8Value)
+        {
+            _ = builder.Append(int8Value);
+        }
+        else if (value is short int16Value)
+        {
+            _ = builder.Append(int16Value);
+        }
+        else if (value is int int32Value)
+        {
+            _ = builder.Append(int32Value);
+        }
+        else if (value is long int64Value)
+        {
+            _ = builder.Append(int64Value);
+        }
+        else if (value is string stringValue)
         {
             _ = builder.Append('"');
-            _ = builder.Append(value);
+            _ = builder.Append(stringValue);
             _ = builder.Append('"');
         }
         else
         {
-            _ = builder.Append(value);
+            throw new NotSupportedException();
         }
 
         return builder.ToString();
+
+        static StringBuilder AppendOffset(StringBuilder builder, Instruction instruction)
+        {
+            _ = builder.Append("IL_");
+            var offset = instruction.Offset;
+            return builder.Append(offset.ToString("X4"));
+        }
     }
 }
