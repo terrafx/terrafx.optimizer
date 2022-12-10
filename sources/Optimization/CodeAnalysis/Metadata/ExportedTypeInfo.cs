@@ -1,10 +1,10 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -21,10 +21,7 @@ public sealed class ExportedTypeInfo : MetadataInfo
 
     private ExportedTypeInfo(ExportedType exportedType, MetadataReader metadataReader)
     {
-        if (metadataReader is null)
-        {
-            throw new ArgumentNullException(nameof(metadataReader));
-        }
+        ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _exportedType = exportedType;
@@ -61,24 +58,35 @@ public sealed class ExportedTypeInfo : MetadataInfo
                 var metadataReader = MetadataReader;
                 var implementationHandle = ExportedType.Implementation;
 
-                if (implementationHandle.Kind == HandleKind.AssemblyFile)
+                switch (implementationHandle.Kind)
                 {
-                    var assemblyFileHandle = (AssemblyFileHandle)implementationHandle;
-                    implementation = CompilerInfo.Instance.Resolve(assemblyFileHandle, metadataReader);
-                }
-                else if (implementationHandle.Kind == HandleKind.AssemblyReference)
-                {
-                    var assemblyReferenceHandle = (AssemblyReferenceHandle)implementationHandle;
-                    implementation = CompilerInfo.Instance.Resolve(assemblyReferenceHandle, metadataReader);
-                }
-                else if (implementationHandle.Kind == HandleKind.ExportedType)
-                {
-                    var exportedTypeHandle = (ExportedTypeHandle)implementationHandle;
-                    implementation = CompilerInfo.Instance.Resolve(exportedTypeHandle, metadataReader);
-                }
-                else
-                {
-                    throw new NotSupportedException();
+                    case HandleKind.AssemblyFile:
+                    {
+
+                        var assemblyFileHandle = (AssemblyFileHandle)implementationHandle;
+                        implementation = CompilerInfo.Instance.Resolve(assemblyFileHandle, metadataReader);
+                        break;
+                    }
+
+                    case HandleKind.AssemblyReference:
+                    {
+                        var assemblyReferenceHandle = (AssemblyReferenceHandle)implementationHandle;
+                        implementation = CompilerInfo.Instance.Resolve(assemblyReferenceHandle, metadataReader);
+                        break;
+                    }
+
+                    case HandleKind.ExportedType:
+                    {
+                        var exportedTypeHandle = (ExportedTypeHandle)implementationHandle;
+                        implementation = CompilerInfo.Instance.Resolve(exportedTypeHandle, metadataReader);
+                        break;
+                    }
+
+                    default:
+                    {
+                        ThrowForInvalidKind(implementationHandle.Kind);
+                        break;
+                    }
                 }
 
                 Debug.Assert(implementation is not null);

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -98,10 +99,7 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
 
     public static Instruction Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
     {
-        if (methodBody is null)
-        {
-            throw new ArgumentNullException(nameof(methodBody));
-        }
+        ThrowIfNull(methodBody);
 
         var ilReader = methodBody.GetILReader();
         var rootInstruction = DecodeNext(metadataReader, ref ilReader);
@@ -279,7 +277,8 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
 
                 default:
                 {
-                    throw new NotSupportedException(nameof(opcode.OperandKind));
+                    ThrowForInvalidKind(opcode.OperandKind);
+                    break;
                 }
             }
 
@@ -310,7 +309,11 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
         {
             return CompareTo(other);
         }
-        return (obj is null) ? 1 : throw new ArgumentException();
+        else if (obj is not null)
+        {
+            ThrowForInvalidType(obj.GetType(), typeof(Instruction));
+        }
+        return 1;
     }
 
     public void Freeze()
@@ -322,7 +325,7 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
     {
         if (IsReadOnly)
         {
-            throw new InvalidOperationException();
+            ThrowForReadOnly(nameof(Instruction));
         }
         var next = instruction._next;
 
@@ -339,7 +342,7 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
     {
         if (IsReadOnly)
         {
-            throw new InvalidOperationException();
+            ThrowForReadOnly(nameof(Instruction));
         }
         var previous = instruction._previous;
 

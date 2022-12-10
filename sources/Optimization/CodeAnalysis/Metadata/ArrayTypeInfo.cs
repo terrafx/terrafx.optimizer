@@ -1,9 +1,9 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Collections.Immutable;
 using System.Reflection.Metadata;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -20,10 +20,7 @@ public sealed class ArrayTypeInfo : MetadataInfo
 
     public ArrayTypeInfo(MetadataInfo elementType, ArrayShape shape)
     {
-        if (elementType is null)
-        {
-            throw new ArgumentNullException(nameof(elementType));
-        }
+        ThrowIfNull(elementType);
 
         _elementType = elementType;
         _shape = shape;

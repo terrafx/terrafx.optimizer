@@ -1,10 +1,10 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -22,10 +22,7 @@ public sealed class MethodSpecificationInfo : MetadataInfo
 
     private MethodSpecificationInfo(MethodSpecification methodSpecification, MetadataReader metadataReader)
     {
-        if (metadataReader is null)
-        {
-            throw new ArgumentNullException(nameof(metadataReader));
-        }
+        ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _methodSpecification = methodSpecification;
@@ -86,7 +83,7 @@ public sealed class MethodSpecificationInfo : MetadataInfo
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    ThrowUnreachableException();
                 }
 
                 _isSignatureInitialized = true;
@@ -149,7 +146,7 @@ public sealed class MethodSpecificationInfo : MetadataInfo
         }
         else
         {
-            throw new NotSupportedException();
+            ThrowUnreachableException();
         }
 
         var genericParameterCount = signature.GenericParameterCount;

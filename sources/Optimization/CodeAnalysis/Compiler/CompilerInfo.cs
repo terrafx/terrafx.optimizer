@@ -1,8 +1,8 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Collections.Concurrent;
 using System.Reflection.Metadata;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -67,7 +67,7 @@ public sealed partial class CompilerInfo
         }
 
         return entityHandle.Kind switch {
-            HandleKind.ModuleDefinition => throw new NotImplementedException(),
+            HandleKind.ModuleDefinition => ThrowNotImplementedException<MetadataInfo>(),
             HandleKind.TypeReference => Resolve((TypeReferenceHandle)entityHandle, metadataReader),
             HandleKind.TypeDefinition => Resolve((TypeDefinitionHandle)entityHandle, metadataReader),
             HandleKind.FieldDefinition => Resolve((FieldDefinitionHandle)entityHandle, metadataReader),
@@ -82,29 +82,29 @@ public sealed partial class CompilerInfo
             HandleKind.EventDefinition => Resolve((EventDefinitionHandle)entityHandle, metadataReader),
             HandleKind.PropertyDefinition => Resolve((PropertyDefinitionHandle)entityHandle, metadataReader),
             HandleKind.MethodImplementation => Resolve((MethodImplementationHandle)entityHandle, metadataReader),
-            HandleKind.ModuleReference => throw new NotImplementedException(),
+            HandleKind.ModuleReference => ThrowNotImplementedException<MetadataInfo>(),
             HandleKind.TypeSpecification => Resolve((TypeSpecificationHandle)entityHandle, metadataReader),
-            HandleKind.AssemblyDefinition => throw new NotImplementedException(),
+            HandleKind.AssemblyDefinition => ThrowNotImplementedException<MetadataInfo>(),
             HandleKind.AssemblyReference => Resolve((AssemblyReferenceHandle)entityHandle, metadataReader),
             HandleKind.AssemblyFile => Resolve((AssemblyFileHandle)entityHandle, metadataReader),
             HandleKind.ExportedType => Resolve((ExportedTypeHandle)entityHandle, metadataReader),
-            HandleKind.ManifestResource => throw new NotImplementedException(),
+            HandleKind.ManifestResource => ThrowNotImplementedException<MetadataInfo>(),
             HandleKind.GenericParameter => Resolve((GenericParameterHandle)entityHandle, metadataReader),
             HandleKind.MethodSpecification => Resolve((MethodSpecificationHandle)entityHandle, metadataReader),
             HandleKind.GenericParameterConstraint => Resolve((GenericParameterConstraintHandle)entityHandle, metadataReader),
-            HandleKind.Document => throw new NotImplementedException(),
-            HandleKind.MethodDebugInformation => throw new NotImplementedException(),
-            HandleKind.LocalScope => throw new NotImplementedException(),
-            HandleKind.LocalVariable => throw new NotImplementedException(),
-            HandleKind.LocalConstant => throw new NotImplementedException(),
-            HandleKind.ImportScope => throw new NotImplementedException(),
-            HandleKind.CustomDebugInformation => throw new NotImplementedException(),
-            HandleKind.UserString => throw new NotImplementedException(),
-            HandleKind.Blob => throw new NotImplementedException(),
-            HandleKind.Guid => throw new NotImplementedException(),
-            HandleKind.String => throw new NotImplementedException(),
-            HandleKind.NamespaceDefinition => throw new NotImplementedException(),
-            _ => throw new NotSupportedException(),
+            HandleKind.Document => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.MethodDebugInformation => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.LocalScope => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.LocalVariable => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.LocalConstant => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.ImportScope => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.CustomDebugInformation => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.UserString => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.Blob => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.Guid => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.String => ThrowNotImplementedException<MetadataInfo>(),
+            HandleKind.NamespaceDefinition => ThrowNotImplementedException<MetadataInfo>(),
+            _ => ThrowForInvalidKind<HandleKind, MetadataInfo?>(entityHandle.Kind),
         };
     }
 

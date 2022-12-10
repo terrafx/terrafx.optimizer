@@ -1,7 +1,7 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -11,11 +11,7 @@ public sealed class ByReferenceTypeInfo : MetadataInfo
 
     public ByReferenceTypeInfo(MetadataInfo elementType)
     {
-        if (elementType is null)
-        {
-            throw new ArgumentNullException(nameof(elementType));
-        }
-
+        ThrowIfNull(elementType);
         _elementType = elementType;
     }
 

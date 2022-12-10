@@ -1,7 +1,7 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Reflection.Metadata;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -35,6 +35,6 @@ public sealed class PrimitiveTypeInfo : MetadataInfo
         PrimitiveTypeCode.IntPtr => "native int",
         PrimitiveTypeCode.UIntPtr => "native uint",
         PrimitiveTypeCode.Object => "object",
-        _ => throw new NotSupportedException(),
+        _ => ThrowForInvalidKind<PrimitiveTypeCode, string>(TypeCode),
     };
 }

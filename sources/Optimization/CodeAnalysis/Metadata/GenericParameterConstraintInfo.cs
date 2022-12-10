@@ -1,8 +1,8 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -17,10 +17,7 @@ public sealed class GenericParameterConstraintInfo : MetadataInfo
 
     private GenericParameterConstraintInfo(GenericParameterConstraint genericParameterConstraint, MetadataReader metadataReader)
     {
-        if (metadataReader is null)
-        {
-            throw new ArgumentNullException(nameof(metadataReader));
-        }
+        ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _genericParameterConstraint = genericParameterConstraint;
@@ -86,5 +83,5 @@ public sealed class GenericParameterConstraintInfo : MetadataInfo
         return new GenericParameterConstraintInfo(genericParameterConstraint, metadataReader);
     }
 
-    protected override string ResolveDisplayString() => throw new NotImplementedException();
+    protected override string ResolveDisplayString() => ThrowNotImplementedException<string>();
 }

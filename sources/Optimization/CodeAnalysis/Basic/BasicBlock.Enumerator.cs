@@ -1,8 +1,8 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -17,10 +17,7 @@ public partial class BasicBlock
 
         public Enumerator(Instruction firstInstruction, Instruction? lastInstruction)
         {
-            if (firstInstruction is null)
-            {
-                throw new ArgumentNullException(nameof(firstInstruction));
-            }
+            ThrowIfNull(firstInstruction);
 
             _firstInstruction = firstInstruction;
             _lastInstruction = lastInstruction;

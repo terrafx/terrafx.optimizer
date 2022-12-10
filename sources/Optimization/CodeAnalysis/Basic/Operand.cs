@@ -1,10 +1,9 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -29,7 +28,7 @@ public struct Operand
     {
         get
         {
-            int size;
+            var size = -1;
 
             switch (Kind)
             {
@@ -84,7 +83,8 @@ public struct Operand
 
                 default:
                 {
-                    throw new ArgumentOutOfRangeException(nameof(Kind));
+                    ThrowForInvalidKind(Kind);
+                    break;
                 }
             }
 
@@ -284,13 +284,14 @@ public struct Operand
 
                 default:
                 {
-                    throw new NotSupportedException(nameof(Kind));
+                    ThrowForInvalidKind(Kind);
+                    break;
                 }
             }
 
             if (argumentOutOfRange)
             {
-                throw new ArgumentOutOfRangeException(nameof(value));
+                ThrowForUnsupportedValue(value);
             }
             _value = value;
         }
@@ -434,7 +435,7 @@ public struct Operand
         }
         else
         {
-            throw new NotSupportedException();
+            ThrowUnreachableException();
         }
 
         return builder.ToString();

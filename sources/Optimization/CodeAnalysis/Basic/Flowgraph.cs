@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -27,15 +28,8 @@ public sealed class Flowgraph
 
     public static Flowgraph Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
     {
-        if (metadataReader is null)
-        {
-            throw new ArgumentNullException(nameof(metadataReader));
-        }
-
-        if (methodBody is null)
-        {
-            throw new ArgumentNullException(nameof(methodBody));
-        }
+        ThrowIfNull(metadataReader);
+        ThrowIfNull(methodBody);
 
         // This is essentially a depth-first traversal of the blocks that dynamically
         // adds the parents, children, and instructions during the traversal. We use
@@ -284,7 +278,7 @@ public sealed class Flowgraph
     {
         if (IsReadOnly)
         {
-            throw new InvalidOperationException();
+            ThrowForReadOnly(nameof(Flowgraph));
         }
         _ = _blocks.Add(block);
     }

@@ -1,8 +1,8 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -16,10 +16,7 @@ public partial class MetadataInfoCollection<TMetadataInfo, TMetadataHandle>
 
         public Enumerator(MetadataInfoCollection<TMetadataInfo, TMetadataHandle> collection)
         {
-            if (collection is null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            ThrowIfNull(collection);
 
             _collection = collection;
             _current = null;

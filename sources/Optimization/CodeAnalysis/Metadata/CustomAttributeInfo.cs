@@ -1,9 +1,9 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -20,10 +20,7 @@ public sealed class CustomAttributeInfo : MetadataInfo
 
     private CustomAttributeInfo(CustomAttribute customAttribute, MetadataReader metadataReader)
     {
-        if (metadataReader is null)
-        {
-            throw new ArgumentNullException(nameof(metadataReader));
-        }
+        ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _customAttribute = customAttribute;
@@ -40,19 +37,27 @@ public sealed class CustomAttributeInfo : MetadataInfo
                 var metadataReader = MetadataReader;
                 var constructorHandle = CustomAttribute.Constructor;
 
-                if (constructorHandle.Kind == HandleKind.MethodDefinition)
+                switch (constructorHandle.Kind)
                 {
-                    var methodDefinitionHandle = (MethodDefinitionHandle)constructorHandle;
-                    constructor = CompilerInfo.Instance.Resolve(methodDefinitionHandle, metadataReader);
-                }
-                else if (constructorHandle.Kind == HandleKind.MemberReference)
-                {
-                    var memberReferenceHandle = (MemberReferenceHandle)constructorHandle;
-                    constructor = CompilerInfo.Instance.Resolve(memberReferenceHandle, metadataReader);
-                }
-                else
-                {
-                    throw new NotSupportedException();
+                    case HandleKind.MethodDefinition:
+                    {
+                        var methodDefinitionHandle = (MethodDefinitionHandle)constructorHandle;
+                        constructor = CompilerInfo.Instance.Resolve(methodDefinitionHandle, metadataReader);
+                        break;
+                    }
+
+                    case HandleKind.MemberReference:
+                    {
+                        var memberReferenceHandle = (MemberReferenceHandle)constructorHandle;
+                        constructor = CompilerInfo.Instance.Resolve(memberReferenceHandle, metadataReader);
+                        break;
+                    }
+
+                    default:
+                    {
+                        ThrowForInvalidKind(constructorHandle.Kind);
+                        break;
+                    }
                 }
 
                 Debug.Assert(constructor is not null);

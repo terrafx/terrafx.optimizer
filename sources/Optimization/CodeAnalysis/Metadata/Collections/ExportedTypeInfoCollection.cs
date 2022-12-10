@@ -34,7 +34,7 @@ public sealed class ExportedTypeInfoCollection : MetadataInfoCollection<Exported
         {
             return Empty;
         }
-        return new ExportedTypeInfoCollection(exportedTypeHandles.ToImmutableArray(), metadataReader);
+        return new ExportedTypeInfoCollection(exportedTypeHandles, metadataReader);
     }
 
     protected override ExportedTypeInfo Resolve(ExportedTypeHandle exportedTypeHandle, MetadataReader metadataReader)
