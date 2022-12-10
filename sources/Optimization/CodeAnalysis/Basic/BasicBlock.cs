@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -21,10 +22,7 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
 
     public BasicBlock(Instruction firstInstruction)
     {
-        if (firstInstruction is null)
-        {
-            throw new ArgumentNullException(nameof(firstInstruction));
-        }
+        ThrowIfNull(firstInstruction);
 
         _children = new SortedSet<BasicBlock>();
         _parents = new SortedSet<BasicBlock>();
@@ -48,7 +46,7 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
         {
             if (IsReadOnly)
             {
-                throw new InvalidOperationException();
+                ThrowForReadOnly(nameof(BasicBlock));
             }
             _lastInstruction = value;
         }
@@ -66,7 +64,7 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
     {
         if (IsReadOnly)
         {
-            throw new InvalidOperationException();
+            ThrowForReadOnly(nameof(BasicBlock));
         }
         _ = _children.Add(childBlock);
     }
@@ -75,7 +73,7 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
     {
         if (IsReadOnly)
         {
-            throw new InvalidOperationException();
+            ThrowForReadOnly(nameof(BasicBlock));
         }
 
         foreach (var child in children)
@@ -88,7 +86,7 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
     {
         if (IsReadOnly)
         {
-            throw new InvalidOperationException();
+            ThrowForReadOnly(nameof(BasicBlock));
         }
         _ = _parents.Add(parentBlock);
     }
@@ -105,7 +103,7 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
     {
         if (IsReadOnly)
         {
-            throw new InvalidOperationException();
+            ThrowForReadOnly(nameof(BasicBlock));
         }
         _children.Clear();
     }
@@ -132,7 +130,11 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
         {
             return CompareTo(other);
         }
-        return (obj is null) ? 1 : throw new ArgumentException();
+        else if (obj is not null)
+        {
+            ThrowForInvalidType(obj.GetType(), typeof(BasicBlock));
+        }
+        return 1;
     }
 
     public bool Contains(Instruction instruction)

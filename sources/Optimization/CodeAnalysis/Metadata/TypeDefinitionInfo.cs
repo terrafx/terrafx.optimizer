@@ -1,10 +1,10 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
-using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -34,10 +34,7 @@ public sealed class TypeDefinitionInfo : MetadataInfo
 
     private TypeDefinitionInfo(TypeDefinition typeDefinition, MetadataReader metadataReader)
     {
-        if (metadataReader is null)
-        {
-            throw new ArgumentNullException(nameof(metadataReader));
-        }
+        ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _typeDefinition = typeDefinition;
@@ -73,7 +70,7 @@ public sealed class TypeDefinitionInfo : MetadataInfo
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    ThrowForInvalidKind(baseTypeHandle.Kind);
                 }
 
                 Debug.Assert(baseType is not null);

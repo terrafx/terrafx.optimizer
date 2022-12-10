@@ -4,6 +4,7 @@ using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -38,10 +39,7 @@ public abstract class MetadataInfo
 
     protected static StringBuilder AppendGenericParameters(StringBuilder builder, GenericParameterInfoCollection genericParameters)
     {
-        if (builder is null)
-        {
-            throw new ArgumentNullException(nameof(builder));
-        }
+        ThrowIfNull(builder);
 
         if (genericParameters.Count != 0)
         {
@@ -62,15 +60,8 @@ public abstract class MetadataInfo
 
     protected static StringBuilder AppendParameters(StringBuilder builder, ImmutableArray<MetadataInfo> parameterTypes)
     {
-        if (builder is null)
-        {
-            throw new ArgumentNullException(nameof(builder));
-        }
-
-        if (parameterTypes.Length == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(parameterTypes));
-        }
+        ThrowIfNull(builder);
+        ThrowIfZero(parameterTypes.Length);
 
         _ = builder.Append('(');
 
@@ -90,20 +81,9 @@ public abstract class MetadataInfo
 
     protected static StringBuilder AppendParameters(StringBuilder builder, bool isInstance, ImmutableArray<MetadataInfo> parameterTypes, ParameterInfoCollection parameters)
     {
-        if (builder is null)
-        {
-            throw new ArgumentNullException(nameof(builder));
-        }
-
-        if (parameterTypes.Length == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(parameterTypes));
-        }
-
-        if (parameters.Count == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(parameters));
-        }
+        ThrowIfNull(builder);
+        ThrowIfZero(parameterTypes.Length);
+        ThrowIfZero(parameters.Count);
 
         var parametersBase = (isInstance && (parameters.Count > parameterTypes.Length)) ? 1 : 0;
 

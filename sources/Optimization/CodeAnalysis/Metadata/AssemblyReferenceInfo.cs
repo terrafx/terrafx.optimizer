@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
+using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -19,10 +20,7 @@ public sealed class AssemblyReferenceInfo : MetadataInfo
 
     private AssemblyReferenceInfo(AssemblyReference assemblyReference, MetadataReader metadataReader)
     {
-        if (metadataReader is null)
-        {
-            throw new ArgumentNullException(nameof(metadataReader));
-        }
+        ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _assemblyReference = assemblyReference;

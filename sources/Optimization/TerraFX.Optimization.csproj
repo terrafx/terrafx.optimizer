@@ -7,4 +7,8 @@
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
+    <Compile Remove="Shims/UnreachableException.cs" />
+  </ItemGroup>
+  
 </Project>
