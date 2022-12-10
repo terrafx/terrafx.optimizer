@@ -3,10 +3,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <NoWarn>1591;$(NoWarn)</NoWarn>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <OutputType>Exe</OutputType>
-    <RootNamespace>TerraFX.Optimization</RootNamespace>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>

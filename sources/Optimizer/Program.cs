@@ -2,7 +2,8 @@
 
 using System;
 using System.CommandLine;
-using System.CommandLine.Invocation;
+using System.CommandLine.Builder;
+using System.CommandLine.Parsing;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
@@ -14,21 +15,28 @@ namespace TerraFX.Optimization;
 
 public static class Program
 {
-    private static readonly RootCommand s_rootCommand = new RootCommand();
+    private static readonly RootCommand s_rootCommand = new RootCommand("TerraFX IL Optimizer");
 
-#pragma warning disable IDE1006
     public static async Task<int> Main(params string[] args)
     {
-        s_rootCommand.Description = "TerraFX IL Optimizer";
-        s_rootCommand.Handler = CommandHandler.Create(typeof(Program).GetMethod(nameof(Run))!);
+        Handler.SetHandler(s_rootCommand, Run);
 
-        return await s_rootCommand.InvokeAsync(args);
+        var parser = new CommandLineBuilder(s_rootCommand)
+            .UseHelp()
+            .UseEnvironmentVariableDirective()
+            .UseParseDirective()
+            .UseSuggestDirective()
+            .RegisterWithDotnetSuggest()
+            .UseTypoCorrections()
+            .UseParseErrorReporting()
+            .UseExceptionHandler()
+            .CancelOnProcessTermination()
+            .Build();
+        return await parser.InvokeAsync(args);
     }
 
-    public static int Run()
+    public static void Run()
     {
-        var exitCode = 0;
-
         using var peStream = File.OpenRead("TerraFX.Optimization.dll");
         using var peReader = new PEReader(peStream);
 
@@ -60,7 +68,5 @@ public static class Program
                 Console.WriteLine(block.LastInstruction);
             }
         }
-
-        return exitCode;
     }
 }
