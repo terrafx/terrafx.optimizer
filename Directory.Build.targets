@@ -12,7 +12,7 @@
 
   <!-- Settings that append the existing setting value -->
   <PropertyGroup>
-    <NoWarn>$(NoWarn);NU5105</NoWarn>
+    <NoWarn>$(NoWarn)</NoWarn>
   </PropertyGroup>
 
   <!-- Settings that are only set for CI builds -->
@@ -27,17 +27,8 @@
 
   <!-- Settings that are only set for libraries -->
   <PropertyGroup Condition="'$(OutputType)' == 'Library'">
-    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
-    <IsTrimmable>false</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
-
-  <!-- Package versions for package references across all projects -->
-  <ItemGroup>
-    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.0" />
-    <PackageReference Update="NUnit" Version="3.13.2" />
-    <PackageReference Update="NUnit3TestAdapter" Version="4.0.0" />
-    <PackageReference Update="System.CommandLine" Version="2.0.0-beta1.21308.1" />
-  </ItemGroup>
 
 </Project>

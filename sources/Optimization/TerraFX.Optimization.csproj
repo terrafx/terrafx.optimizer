@@ -3,8 +3,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <NoWarn>1591;$(NoWarn)</NoWarn>
-    <TargetFramework>net6.0</TargetFramework>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
   </PropertyGroup>
 
 </Project>
