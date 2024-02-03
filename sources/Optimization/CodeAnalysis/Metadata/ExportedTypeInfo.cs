@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
@@ -21,7 +22,7 @@ public sealed class ExportedTypeInfo : MetadataInfo
 
     private ExportedTypeInfo(ExportedType exportedType, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _exportedType = exportedType;
@@ -153,6 +154,7 @@ public sealed class ExportedTypeInfo : MetadataInfo
 
     public static ExportedTypeInfo Create(ExportedTypeHandle exportedTypeHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var exportedType = metadataReader.GetExportedType(exportedTypeHandle);
         return new ExportedTypeInfo(exportedType, metadataReader);
     }

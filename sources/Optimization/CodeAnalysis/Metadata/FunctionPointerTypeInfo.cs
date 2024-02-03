@@ -6,14 +6,9 @@ using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
-public sealed class FunctionPointerTypeInfo : MetadataInfo
+public sealed class FunctionPointerTypeInfo(MethodSignature<MetadataInfo> signature) : MetadataInfo
 {
-    private readonly MethodSignature<MetadataInfo> _signature;
-
-    public FunctionPointerTypeInfo(MethodSignature<MetadataInfo> signature)
-    {
-        _signature = signature;
-    }
+    private readonly MethodSignature<MetadataInfo> _signature = signature;
 
     public ref readonly MethodSignature<MetadataInfo> Signature => ref _signature;
 

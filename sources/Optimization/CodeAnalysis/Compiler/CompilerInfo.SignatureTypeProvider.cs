@@ -8,7 +8,7 @@ namespace TerraFX.Optimization.CodeAnalysis;
 
 public partial class CompilerInfo
 {
-    public sealed class SignatureTypeProvider : ISignatureTypeProvider<MetadataInfo, MetadataInfo>
+    internal sealed class SignatureTypeProvider : ISignatureTypeProvider<MetadataInfo, MetadataInfo>
     {
         public static readonly SignatureTypeProvider Instance = new SignatureTypeProvider();
 
@@ -34,23 +34,23 @@ public partial class CompilerInfo
 
         public MetadataInfo GetSZArrayType(MetadataInfo elementType) => new ArrayTypeInfo(elementType);
 
-        public MetadataInfo GetTypeFromDefinition(MetadataReader metadataReader, TypeDefinitionHandle typeDefinitionHandle, byte rawTypeKind)
+        public MetadataInfo GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind)
         {
-            var typeDefinition = CompilerInfo.Instance.Resolve(typeDefinitionHandle, metadataReader);
+            var typeDefinition = CompilerInfo.Instance.Resolve(handle, reader);
             Debug.Assert(typeDefinition is not null);
             return typeDefinition;
         }
 
-        public MetadataInfo GetTypeFromReference(MetadataReader metadataReader, TypeReferenceHandle typeReferenceHandle, byte rawTypeKind)
+        public MetadataInfo GetTypeFromReference(MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind)
         {
-            var typeReference = CompilerInfo.Instance.Resolve(typeReferenceHandle, metadataReader);
+            var typeReference = CompilerInfo.Instance.Resolve(handle, reader);
             Debug.Assert(typeReference is not null);
             return typeReference;
         }
 
-        public MetadataInfo GetTypeFromSpecification(MetadataReader metadataReader, MetadataInfo genericContext, TypeSpecificationHandle typeSpecificationHandle, byte rawTypeKind)
+        public MetadataInfo GetTypeFromSpecification(MetadataReader reader, MetadataInfo genericContext, TypeSpecificationHandle handle, byte rawTypeKind)
         {
-            var typeSpecification = CompilerInfo.Instance.Resolve(typeSpecificationHandle, metadataReader);
+            var typeSpecification = CompilerInfo.Instance.Resolve(handle, reader);
             Debug.Assert(typeSpecification is not null);
             return typeSpecification;
         }

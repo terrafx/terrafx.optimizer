@@ -17,7 +17,7 @@ public sealed class Flowgraph
 
     public Flowgraph()
     {
-        _blocks = new SortedSet<BasicBlock>();
+        _blocks = [];
     }
 
     public IReadOnlySet<BasicBlock> Blocks => _blocks;
@@ -28,8 +28,8 @@ public sealed class Flowgraph
 
     public static Flowgraph Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
     {
-        ThrowIfNull(metadataReader);
-        ThrowIfNull(methodBody);
+        ArgumentNullException.ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(methodBody);
 
         // This is essentially a depth-first traversal of the blocks that dynamically
         // adds the parents, children, and instructions during the traversal. We use

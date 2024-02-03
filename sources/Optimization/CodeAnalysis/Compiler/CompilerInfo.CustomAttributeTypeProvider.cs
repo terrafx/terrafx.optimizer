@@ -7,7 +7,7 @@ namespace TerraFX.Optimization.CodeAnalysis;
 
 public partial class CompilerInfo
 {
-    public class CustomAttributeTypeProvider : ICustomAttributeTypeProvider<MetadataInfo>
+    internal class CustomAttributeTypeProvider : ICustomAttributeTypeProvider<MetadataInfo>
     {
         public static readonly CustomAttributeTypeProvider Instance = new CustomAttributeTypeProvider();
 
@@ -17,9 +17,9 @@ public partial class CompilerInfo
 
         public MetadataInfo GetSZArrayType(MetadataInfo elementType) => SignatureTypeProvider.Instance.GetSZArrayType(elementType);
 
-        public MetadataInfo GetTypeFromDefinition(MetadataReader metadataReader, TypeDefinitionHandle typeDefinitionHandle, byte rawTypeKind) => SignatureTypeProvider.Instance.GetTypeFromDefinition(metadataReader, typeDefinitionHandle, rawTypeKind);
+        public MetadataInfo GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind) => SignatureTypeProvider.Instance.GetTypeFromDefinition(reader, handle, rawTypeKind);
 
-        public MetadataInfo GetTypeFromReference(MetadataReader metadataReader, TypeReferenceHandle typeReferenceHandle, byte rawTypeKind) => SignatureTypeProvider.Instance.GetTypeFromReference(metadataReader, typeReferenceHandle, rawTypeKind);
+        public MetadataInfo GetTypeFromReference(MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind) => SignatureTypeProvider.Instance.GetTypeFromReference(reader, handle, rawTypeKind);
 
         public MetadataInfo GetTypeFromSerializedName(string name) => ThrowNotImplementedException<MetadataInfo>();
 

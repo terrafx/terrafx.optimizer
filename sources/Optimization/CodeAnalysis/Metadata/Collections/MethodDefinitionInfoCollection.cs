@@ -21,16 +21,14 @@ public sealed class MethodDefinitionInfoCollection : MetadataInfoCollection<Meth
 
     public static MethodDefinitionInfoCollection Create(MethodDefinitionHandleCollection methodDefinitionHandles, MetadataReader metadataReader)
     {
-        if (methodDefinitionHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new MethodDefinitionInfoCollection(methodDefinitionHandles.ToImmutableArray(), metadataReader);
+        return (methodDefinitionHandles.Count == 0)
+             ? Empty
+             : new MethodDefinitionInfoCollection([.. methodDefinitionHandles], metadataReader);
     }
 
-    protected override MethodDefinitionInfo Resolve(MethodDefinitionHandle methodDefinitionHandle, MetadataReader metadataReader)
+    protected override MethodDefinitionInfo Resolve(MethodDefinitionHandle metadataHandle, MetadataReader metadataReader)
     {
-        var methodDefinitionInfo = CompilerInfo.Instance.Resolve(methodDefinitionHandle, metadataReader);
+        var methodDefinitionInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(methodDefinitionInfo is not null);
         return methodDefinitionInfo;
     }

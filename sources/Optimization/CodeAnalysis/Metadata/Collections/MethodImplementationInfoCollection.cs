@@ -21,16 +21,14 @@ public sealed class MethodImplementationInfoCollection : MetadataInfoCollection<
 
     public static MethodImplementationInfoCollection Create(MethodImplementationHandleCollection methodImplementationHandles, MetadataReader metadataReader)
     {
-        if (methodImplementationHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new MethodImplementationInfoCollection(methodImplementationHandles.ToImmutableArray(), metadataReader);
+        return methodImplementationHandles.Count == 0
+             ? Empty
+             : new MethodImplementationInfoCollection([.. methodImplementationHandles], metadataReader);
     }
 
-    protected override MethodImplementationInfo Resolve(MethodImplementationHandle methodImplementationHandle, MetadataReader metadataReader)
+    protected override MethodImplementationInfo Resolve(MethodImplementationHandle metadataHandle, MetadataReader metadataReader)
     {
-        var methodImplementationInfo = CompilerInfo.Instance.Resolve(methodImplementationHandle, metadataReader);
+        var methodImplementationInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(methodImplementationInfo is not null);
         return methodImplementationInfo;
     }

@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Text;
@@ -20,7 +21,7 @@ public sealed class CustomAttributeInfo : MetadataInfo
 
     private CustomAttributeInfo(CustomAttribute customAttribute, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _customAttribute = customAttribute;
@@ -105,6 +106,7 @@ public sealed class CustomAttributeInfo : MetadataInfo
 
     public static CustomAttributeInfo Create(CustomAttributeHandle customAttributeHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var customAttribute = metadataReader.GetCustomAttribute(customAttributeHandle);
         return new CustomAttributeInfo(customAttribute, metadataReader);
     }

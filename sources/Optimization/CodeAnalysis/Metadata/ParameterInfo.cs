@@ -1,8 +1,8 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Reflection;
 using System.Reflection.Metadata;
-using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -17,7 +17,7 @@ public sealed class ParameterInfo : MetadataInfo
 
     private ParameterInfo(Parameter parameter, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _parameter = parameter;
@@ -83,6 +83,7 @@ public sealed class ParameterInfo : MetadataInfo
 
     public static ParameterInfo Create(ParameterHandle parameterHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var parameter = metadataReader.GetParameter(parameterHandle);
         return new ParameterInfo(parameter, metadataReader);
     }

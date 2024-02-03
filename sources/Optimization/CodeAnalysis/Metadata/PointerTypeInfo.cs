@@ -1,7 +1,7 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Text;
-using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -11,7 +11,7 @@ public sealed class PointerTypeInfo : MetadataInfo
 
     public PointerTypeInfo(MetadataInfo elementType)
     {
-        ThrowIfNull(elementType);
+        ArgumentNullException.ThrowIfNull(elementType);
         _elementType = elementType;
     }
 

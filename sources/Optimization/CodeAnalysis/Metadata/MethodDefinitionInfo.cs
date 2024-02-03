@@ -1,10 +1,10 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
-using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -27,7 +27,7 @@ public sealed class MethodDefinitionInfo : MetadataInfo
 
     private MethodDefinitionInfo(MethodDefinition methodDefinition, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _methodDefinition = methodDefinition;
@@ -172,6 +172,7 @@ public sealed class MethodDefinitionInfo : MetadataInfo
 
     public static MethodDefinitionInfo Create(MethodDefinitionHandle methodDefinitionHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var methodDefinition = metadataReader.GetMethodDefinition(methodDefinitionHandle);
         return new MethodDefinitionInfo(methodDefinition, metadataReader);
     }

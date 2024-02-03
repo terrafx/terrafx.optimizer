@@ -1,8 +1,8 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Collections.Immutable;
 using System.Text;
-using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -13,7 +13,7 @@ public sealed class GenericInstantiationInfo : MetadataInfo
 
     public GenericInstantiationInfo(MetadataInfo genericType, ImmutableArray<MetadataInfo> typeArguments)
     {
-        ThrowIfNull(genericType);
+        ArgumentNullException.ThrowIfNull(genericType);
 
         _genericType = genericType;
         _typeArguments = typeArguments;

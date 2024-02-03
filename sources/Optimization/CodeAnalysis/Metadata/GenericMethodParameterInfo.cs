@@ -4,16 +4,10 @@ using System.Text;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
-public sealed class GenericMethodParameterInfo : MetadataInfo
+public sealed class GenericMethodParameterInfo(MetadataInfo genericContext, int index) : MetadataInfo
 {
-    private readonly MetadataInfo _genericContext;
-    private readonly int _index;
-
-    public GenericMethodParameterInfo(MetadataInfo genericContext, int index)
-    {
-        _genericContext = genericContext;
-        _index = index;
-    }
+    private readonly MetadataInfo _genericContext = genericContext;
+    private readonly int _index = index;
 
     public MetadataInfo GenericContext => _genericContext;
 

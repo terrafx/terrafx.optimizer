@@ -21,16 +21,14 @@ public sealed class GenericParameterConstraintInfoCollection : MetadataInfoColle
 
     public static GenericParameterConstraintInfoCollection Create(GenericParameterConstraintHandleCollection genericParameterConstraintHandles, MetadataReader metadataReader)
     {
-        if (genericParameterConstraintHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new GenericParameterConstraintInfoCollection(genericParameterConstraintHandles.ToImmutableArray(), metadataReader);
+        return genericParameterConstraintHandles.Count == 0
+             ? Empty
+             : new GenericParameterConstraintInfoCollection([.. genericParameterConstraintHandles], metadataReader);
     }
 
-    protected override GenericParameterConstraintInfo Resolve(GenericParameterConstraintHandle genericParameterConstraintHandle, MetadataReader metadataReader)
+    protected override GenericParameterConstraintInfo Resolve(GenericParameterConstraintHandle metadataHandle, MetadataReader metadataReader)
     {
-        var genericParameterConstraintInfo = CompilerInfo.Instance.Resolve(genericParameterConstraintHandle, metadataReader);
+        var genericParameterConstraintInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(genericParameterConstraintInfo is not null);
         return genericParameterConstraintInfo;
     }

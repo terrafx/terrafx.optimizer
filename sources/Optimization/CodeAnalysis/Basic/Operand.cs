@@ -1,13 +1,16 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Reflection.Metadata;
 using System.Text;
 using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
-public struct Operand
+public struct Operand : IEquatable<Operand>
 {
     private readonly OperandKind _kind;
     private readonly MetadataReader _metadataReader;
@@ -20,11 +23,11 @@ public struct Operand
         _value = value;
     }
 
-    public OperandKind Kind => _kind;
+    public readonly OperandKind Kind => _kind;
 
-    public MetadataReader MetadataReader => _metadataReader;
+    public readonly MetadataReader MetadataReader => _metadataReader;
 
-    public int Size
+    public readonly int Size
     {
         get
         {
@@ -94,7 +97,7 @@ public struct Operand
 
     public object? Value
     {
-        get
+        readonly get
         {
             return _value;
         }
@@ -297,51 +300,64 @@ public struct Operand
         }
     }
 
-    public double AsDouble() => (double)Value!;
+    public static bool operator ==(Operand left, Operand right)
+        => (left._kind == right._kind)
+        && (left._metadataReader == right._metadataReader)
+        && (left._value == right._value);
 
-    public FieldDefinitionInfo AsFieldDefinitionInfo() => (FieldDefinitionInfo)Value!;
+    public static bool operator !=(Operand left, Operand right) => !(left == right);
+
+    public readonly double AsDouble() => (double)Value!;
+
+    public readonly FieldDefinitionInfo AsFieldDefinitionInfo() => (FieldDefinitionInfo)Value!;
     
-    public Instruction AsInstruction() => (Instruction)Value!;
+    public readonly Instruction AsInstruction() => (Instruction)Value!;
 
-    public ImmutableArray<Instruction> AsInstructions() => (ImmutableArray<Instruction>)Value!;
+    public readonly ImmutableArray<Instruction> AsInstructions() => (ImmutableArray<Instruction>)Value!;
 
-    public sbyte AsInt8() => (sbyte)Value!;
+    public readonly sbyte AsInt8() => (sbyte)Value!;
 
-    public short AsInt16() => (short)Value!;
+    public readonly short AsInt16() => (short)Value!;
 
-    public int AsInt32() => (int)Value!;
+    public readonly int AsInt32() => (int)Value!;
 
-    public long AsInt64() => (long)Value!;
+    public readonly long AsInt64() => (long)Value!;
 
-    public MemberReferenceInfo AsMemberReferenceInfo() => (MemberReferenceInfo)Value!;
+    public readonly MemberReferenceInfo AsMemberReferenceInfo() => (MemberReferenceInfo)Value!;
 
-    public MetadataInfo AsMetadataInfo() => (MetadataInfo)Value!;
+    public readonly MetadataInfo AsMetadataInfo() => (MetadataInfo)Value!;
 
-    public MethodDefinitionInfo AsMethodDefinitionInfo() => (MethodDefinitionInfo)Value!;
+    public readonly MethodDefinitionInfo AsMethodDefinitionInfo() => (MethodDefinitionInfo)Value!;
 
-    public MethodSpecificationInfo AsMethodSpecificationInfo() => (MethodSpecificationInfo)Value!;
+    public readonly MethodSpecificationInfo AsMethodSpecificationInfo() => (MethodSpecificationInfo)Value!;
 
-    public float AsSingle() => (float)Value!;
+    public readonly float AsSingle() => (float)Value!;
 
-    public StandaloneSignatureInfo AsStandaloneSignatureInfo() => (StandaloneSignatureInfo)Value!;
+    public readonly StandaloneSignatureInfo AsStandaloneSignatureInfo() => (StandaloneSignatureInfo)Value!;
 
-    public string AsString() => (string)Value!;
+    public readonly string AsString() => (string)Value!;
 
-    public TypeDefinitionInfo AsTypeDefinitionInfo() => (TypeDefinitionInfo)Value!;
+    public readonly TypeDefinitionInfo AsTypeDefinitionInfo() => (TypeDefinitionInfo)Value!;
 
-    public TypeReferenceInfo AsTypeReferenceInfo() => (TypeReferenceInfo)Value!;
+    public readonly TypeReferenceInfo AsTypeReferenceInfo() => (TypeReferenceInfo)Value!;
 
-    public TypeSpecificationInfo AsTypeSpecificationInfo() => (TypeSpecificationInfo)Value!;
+    public readonly TypeSpecificationInfo AsTypeSpecificationInfo() => (TypeSpecificationInfo)Value!;
 
-    public byte AsUInt8() => (byte)(sbyte)Value!;
+    public readonly byte AsUInt8() => (byte)(sbyte)Value!;
 
-    public ushort AsUInt16() => (ushort)(short)Value!;
+    public readonly ushort AsUInt16() => (ushort)(short)Value!;
 
-    public uint AsUInt32() => (uint)(int)Value!;
+    public readonly uint AsUInt32() => (uint)(int)Value!;
 
-    public ulong AsUInt64() => (ulong)(long)Value!;
+    public readonly ulong AsUInt64() => (ulong)(long)Value!;
 
-    public override string ToString()
+    public readonly bool Equals(Operand other) => this == other;
+
+    public override readonly bool Equals([NotNullWhen(true)] object? obj) => (obj is Operand other) && Equals(other);
+
+    public override readonly int GetHashCode() => HashCode.Combine(_kind, _metadataReader, _value);
+
+    public override readonly string ToString()
     {
         var value = _value;
 
@@ -444,7 +460,7 @@ public struct Operand
         {
             _ = builder.Append("IL_");
             var offset = instruction.Offset;
-            return builder.Append(offset.ToString("X4"));
+            return builder.Append(offset.ToString("X4", CultureInfo.InvariantCulture));
         }
     }
 }

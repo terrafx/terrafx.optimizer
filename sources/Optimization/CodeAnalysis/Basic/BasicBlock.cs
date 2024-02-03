@@ -3,14 +3,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
 /// <summary>Defines a basic block of instructions, for use in a control flow graph.</summary>
-public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, IEnumerable<Instruction>
+public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, IEnumerable<Instruction>, IEquatable<BasicBlock>
 {
     private readonly Instruction _firstInstruction;
 
@@ -22,10 +24,10 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
 
     public BasicBlock(Instruction firstInstruction)
     {
-        ThrowIfNull(firstInstruction);
+        ArgumentNullException.ThrowIfNull(firstInstruction);
 
-        _children = new SortedSet<BasicBlock>();
-        _parents = new SortedSet<BasicBlock>();
+        _children = [];
+        _parents = [];
 
         _firstInstruction = firstInstruction;
         _lastInstruction = firstInstruction;
@@ -60,6 +62,22 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
 
     public IReadOnlySet<BasicBlock> Parents => _parents;
 
+    public static bool operator ==(BasicBlock? left, BasicBlock? right) => ReferenceEquals(left, right);
+
+    public static bool operator !=(BasicBlock? left, BasicBlock? right) => !(left == right);
+
+    public static bool operator <(BasicBlock? left, BasicBlock? right)
+        => (left is null) ? (right is not null) : (left.CompareTo(right) < 0);
+
+    public static bool operator <=(BasicBlock? left, BasicBlock? right)
+        => (left is null) || (left.CompareTo(right) <= 0);
+
+    public static bool operator >(BasicBlock? left, BasicBlock? right)
+        => (left is not null) && (left.CompareTo(right) > 0);
+
+    public static bool operator >=(BasicBlock? left, BasicBlock? right)
+        => (left is null) ? (right is null) : (left.CompareTo(right) >= 0);
+
     public void AddChild(BasicBlock childBlock)
     {
         if (IsReadOnly)
@@ -71,6 +89,8 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
 
     public void AddChildren(IEnumerable<BasicBlock> children)
     {
+        ArgumentNullException.ThrowIfNull(children);
+
         if (IsReadOnly)
         {
             ThrowForReadOnly(nameof(BasicBlock));
@@ -91,13 +111,9 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
         _ = _parents.Add(parentBlock);
     }
 
-    public bool CanReach(BasicBlock block)
-    {
-        // Determining if this block can reach the target block is a simple traversal
-        // where we return true if the traversed block is ever the target block.
-
-        return TraverseDepthFirst((traversedBlock) => traversedBlock == block).Any();
-    }
+    // Determining if this block can reach the target block is a simple traversal
+    // where we return true if the traversed block is ever the target block.
+    public bool CanReach(BasicBlock block) => TraverseDepthFirst((traversedBlock) => traversedBlock == block).Any();
 
     public void ClearChildren()
     {
@@ -118,10 +134,7 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
         {
             return FirstInstruction.CompareTo(other.FirstInstruction);
         }
-        else
-        {
-            return 1;
-        }
+        return 1;
     }
 
     public int CompareTo(object? obj)
@@ -150,12 +163,18 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
         return instruction == LastInstruction;
     }
 
+    public bool Equals(BasicBlock? other) => this == other;
+
+    public override bool Equals(object? obj) => (obj is BasicBlock other) && Equals(other);
+
     public void Freeze()
     {
         _isReadOnly = true;
     }
 
     public Enumerator GetEnumerator() => new Enumerator(FirstInstruction, LastInstruction);
+
+    public override int GetHashCode() => base.GetHashCode();
 
     public int GetInstructionCount()
     {
@@ -185,7 +204,7 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
         var firstInstruction = FirstInstruction;
 
         _ = builder.Append("IL_");
-        _ = builder.Append(firstInstruction.Offset.ToString("X4"));
+        _ = builder.Append(firstInstruction.Offset.ToString("X4", CultureInfo.InvariantCulture));
 
         var lastInstruction = LastInstruction;
 
@@ -195,7 +214,7 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
             _ = builder.Append(' ');
 
             _ = builder.Append("IL_");
-            _ = builder.Append(lastInstruction.Offset.ToString("X4"));
+            _ = builder.Append(lastInstruction.Offset.ToString("X4", CultureInfo.InvariantCulture));
         }
 
         return builder.ToString();
@@ -203,6 +222,8 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
 
     public void TraverseBreadthFirst(Action<BasicBlock> action)
     {
+        ArgumentNullException.ThrowIfNull(action);
+
         // We do a breadth-first traversal of the blocks using a queue-based algorithm
         // to track pending blocks, rather than using recursion, so that we can
         // process much more complex graphs.
@@ -231,6 +252,8 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
 
     public IEnumerable<T> TraverseBreadthFirst<T>(Func<BasicBlock, T> func)
     {
+        ArgumentNullException.ThrowIfNull(func);
+
         // We do a breadth-first traversal of the blocks using a queue-based algorithm
         // to track pending blocks, rather than using recursion, so that we can
         // process much more complex graphs.
@@ -259,6 +282,8 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
 
     public void TraverseDepthFirst(Action<BasicBlock> action)
     {
+        ArgumentNullException.ThrowIfNull(action);
+
         // We do a depth-first traversal of the blocks using a stack-based algorithm
         // to track pending blocks, rather than using recursion, so that we can
         // process much more complex graphs.
@@ -287,6 +312,8 @@ public sealed partial class BasicBlock : IComparable, IComparable<BasicBlock>, I
 
     public IEnumerable<T> TraverseDepthFirst<T>(Func<BasicBlock, T> func)
     {
+        ArgumentNullException.ThrowIfNull(func);
+
         // We do a depth-first traversal of the blocks using a stack-based algorithm
         // to track pending blocks, rather than using recursion, so that we can
         // process much more complex graphs.

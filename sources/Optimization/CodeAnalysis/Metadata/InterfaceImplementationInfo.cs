@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using static TerraFX.Optimization.Utilities.ExceptionUtilities;
@@ -16,7 +17,7 @@ public sealed class InterfaceImplementationInfo : MetadataInfo
 
     private InterfaceImplementationInfo(InterfaceImplementation interfaceImplementation, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _interfaceImplementation = interfaceImplementation;
@@ -59,6 +60,7 @@ public sealed class InterfaceImplementationInfo : MetadataInfo
 
     public static InterfaceImplementationInfo Create(InterfaceImplementationHandle interfaceImplementationHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var interfaceImplementation = metadataReader.GetInterfaceImplementation(interfaceImplementationHandle);
         return new InterfaceImplementationInfo(interfaceImplementation, metadataReader);
     }

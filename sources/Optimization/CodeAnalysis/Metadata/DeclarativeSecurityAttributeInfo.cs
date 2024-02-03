@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
@@ -16,7 +17,7 @@ public sealed class DeclarativeSecurityAttributeInfo : MetadataInfo
 
     private DeclarativeSecurityAttributeInfo(DeclarativeSecurityAttribute declarativeSecurityAttribute, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _declarativeSecurityAttribute = declarativeSecurityAttribute;
@@ -49,6 +50,7 @@ public sealed class DeclarativeSecurityAttributeInfo : MetadataInfo
 
     public static DeclarativeSecurityAttributeInfo Create(DeclarativeSecurityAttributeHandle declarativeSecurityAttributeHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var declarativeSecurityAttribute = metadataReader.GetDeclarativeSecurityAttribute(declarativeSecurityAttributeHandle);
         return new DeclarativeSecurityAttributeInfo(declarativeSecurityAttribute, metadataReader);
     }

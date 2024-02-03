@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -11,27 +12,18 @@ using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
-public sealed partial class Instruction : IComparable, IComparable<Instruction>
+public sealed partial class Instruction(Opcode opcode, Operand operand) : IComparable, IComparable<Instruction>, IEquatable<Instruction>
 {
-    private readonly Opcode _opcode;
+    private readonly Opcode _opcode = opcode;
 
     private Instruction? _next;
-    private Operand _operand;
+    private Operand _operand = operand;
     private Instruction? _previous;
 
-    private int _index;
-    private int _offset;
+    private int _index = -1;
+    private int _offset = -1;
 
     private bool _isReadonly;
-
-    public Instruction(Opcode opcode, Operand operand)
-    {
-        _opcode = opcode;
-        _operand = operand;
-
-        _index = -1;
-        _offset = -1;
-    }
 
     public int Index
     {
@@ -97,9 +89,25 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
 
     public Instruction? Previous => _previous;
 
+    public static bool operator ==(Instruction? left, Instruction? right) => ReferenceEquals(left, right);
+
+    public static bool operator !=(Instruction? left, Instruction? right) => !(left == right);
+
+    public static bool operator <(Instruction? left, Instruction? right)
+        => (left is null) ? (right is not null) : (left.CompareTo(right) < 0);
+
+    public static bool operator <=(Instruction? left, Instruction? right)
+        => (left is null) || (left.CompareTo(right) <= 0);
+
+    public static bool operator >(Instruction? left, Instruction? right)
+        => (left is not null) && (left.CompareTo(right) > 0);
+
+    public static bool operator >=(Instruction? left, Instruction? right)
+        => (left is null) ? (right is null) : (left.CompareTo(right) >= 0);
+
     public static Instruction Decode(MetadataReader metadataReader, MethodBodyBlock methodBody)
     {
-        ThrowIfNull(methodBody);
+        ArgumentNullException.ThrowIfNull(methodBody);
 
         var ilReader = methodBody.GetILReader();
         var rootInstruction = DecodeNext(metadataReader, ref ilReader);
@@ -297,10 +305,7 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
         {
             return Index.CompareTo(other.Index);
         }
-        else
-        {
-            return 1;
-        }
+        return 1;
     }
 
     public int CompareTo(object? obj)
@@ -316,6 +321,12 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
         return 1;
     }
 
+    public bool Equals(Instruction? other) => this == other;
+
+    public override bool Equals(object? obj) => (obj is Instruction other) && Equals(other);
+
+    public override int GetHashCode() => base.GetHashCode();
+
     public void Freeze()
     {
         _isReadonly = true;
@@ -323,6 +334,8 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
 
     public void InsertAfter(Instruction instruction)
     {
+        ArgumentNullException.ThrowIfNull(instruction);
+
         if (IsReadOnly)
         {
             ThrowForReadOnly(nameof(Instruction));
@@ -340,6 +353,8 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
 
     public void InsertBefore(Instruction instruction)
     {
+        ArgumentNullException.ThrowIfNull(instruction);
+
         if (IsReadOnly)
         {
             ThrowForReadOnly(nameof(Instruction));
@@ -360,7 +375,7 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
         var builder = new StringBuilder();
 
         _ = builder.Append("IL_");
-        _ = builder.Append(Offset.ToString("X4"));
+        _ = builder.Append(Offset.ToString("X4", CultureInfo.InvariantCulture));
 
         _ = builder.Append(':');
         _ = builder.Append(' ', 2);
@@ -370,7 +385,7 @@ public sealed partial class Instruction : IComparable, IComparable<Instruction>
 
         var operand = Operand.ToString();
 
-        if (operand != string.Empty)
+        if (!string.IsNullOrEmpty(operand))
         {
             _ = builder.Append(' ', 16 - opcodeName.Length);
             _ = builder.Append(operand);

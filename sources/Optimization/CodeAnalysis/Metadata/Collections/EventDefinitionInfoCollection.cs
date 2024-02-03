@@ -21,16 +21,14 @@ public sealed class EventDefinitionInfoCollection : MetadataInfoCollection<Event
 
     public static EventDefinitionInfoCollection Create(EventDefinitionHandleCollection eventDefinitionHandles, MetadataReader metadataReader)
     {
-        if (eventDefinitionHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new EventDefinitionInfoCollection(eventDefinitionHandles.ToImmutableArray(), metadataReader);
+        return (eventDefinitionHandles.Count == 0)
+             ? Empty
+             : new EventDefinitionInfoCollection([.. eventDefinitionHandles], metadataReader);
     }
 
-    protected override EventDefinitionInfo Resolve(EventDefinitionHandle eventDefinitionHandle, MetadataReader metadataReader)
+    protected override EventDefinitionInfo Resolve(EventDefinitionHandle metadataHandle, MetadataReader metadataReader)
     {
-        var eventDefinitionInfo = CompilerInfo.Instance.Resolve(eventDefinitionHandle, metadataReader);
+        var eventDefinitionInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(eventDefinitionInfo is not null);
         return eventDefinitionInfo;
     }

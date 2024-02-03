@@ -1,9 +1,9 @@
 
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
-using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -17,7 +17,7 @@ public sealed class TypeSpecificationInfo : MetadataInfo
 
     private TypeSpecificationInfo(TypeSpecification typeSpecification, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _typeSpecification = typeSpecification;
@@ -62,6 +62,7 @@ public sealed class TypeSpecificationInfo : MetadataInfo
 
     public static TypeSpecificationInfo Create(TypeSpecificationHandle typeSpecificationHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var typeSpecification = metadataReader.GetTypeSpecification(typeSpecificationHandle);
         return new TypeSpecificationInfo(typeSpecification, metadataReader);
     }

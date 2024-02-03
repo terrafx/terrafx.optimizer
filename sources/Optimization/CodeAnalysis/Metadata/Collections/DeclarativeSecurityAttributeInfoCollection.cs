@@ -21,16 +21,14 @@ public sealed class DeclarativeSecurityAttributeInfoCollection : MetadataInfoCol
 
     public static DeclarativeSecurityAttributeInfoCollection Create(DeclarativeSecurityAttributeHandleCollection declarativeSecurityAttributeHandles, MetadataReader metadataReader)
     {
-        if (declarativeSecurityAttributeHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new DeclarativeSecurityAttributeInfoCollection(declarativeSecurityAttributeHandles.ToImmutableArray(), metadataReader);
+        return declarativeSecurityAttributeHandles.Count == 0
+             ? Empty
+             : new DeclarativeSecurityAttributeInfoCollection([.. declarativeSecurityAttributeHandles], metadataReader);
     }
 
-    protected override DeclarativeSecurityAttributeInfo Resolve(DeclarativeSecurityAttributeHandle declarativeSecurityAttributeHandle, MetadataReader metadataReader)
+    protected override DeclarativeSecurityAttributeInfo Resolve(DeclarativeSecurityAttributeHandle metadataHandle, MetadataReader metadataReader)
     {
-        var declarativeSecurityAttributeInfo = CompilerInfo.Instance.Resolve(declarativeSecurityAttributeHandle, metadataReader);
+        var declarativeSecurityAttributeInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(declarativeSecurityAttributeInfo is not null);
         return declarativeSecurityAttributeInfo;
     }
