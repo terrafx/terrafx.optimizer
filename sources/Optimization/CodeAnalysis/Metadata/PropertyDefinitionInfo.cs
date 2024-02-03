@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Reflection;
 using System.Reflection.Metadata;
 using static TerraFX.Optimization.Utilities.ExceptionUtilities;
@@ -22,7 +23,7 @@ public sealed class PropertyDefinitionInfo : MetadataInfo
 
     private PropertyDefinitionInfo(PropertyDefinition propertyDefinition, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _propertyDefinition = propertyDefinition;
@@ -112,6 +113,7 @@ public sealed class PropertyDefinitionInfo : MetadataInfo
 
     public static PropertyDefinitionInfo Create(PropertyDefinitionHandle propertyDefinitionHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var propertyDefinition = metadataReader.GetPropertyDefinition(propertyDefinitionHandle);
         return new PropertyDefinitionInfo(propertyDefinition, metadataReader);
     }

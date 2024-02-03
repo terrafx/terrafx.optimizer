@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection.Metadata;
@@ -22,7 +23,7 @@ public sealed class MethodSpecificationInfo : MetadataInfo
 
     private MethodSpecificationInfo(MethodSpecification methodSpecification, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _methodSpecification = methodSpecification;
@@ -108,6 +109,7 @@ public sealed class MethodSpecificationInfo : MetadataInfo
 
     public static MethodSpecificationInfo Create(MethodSpecificationHandle methodSpecificationHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var methodSpecification = metadataReader.GetMethodSpecification(methodSpecificationHandle);
         return new MethodSpecificationInfo(methodSpecification, metadataReader);
     }

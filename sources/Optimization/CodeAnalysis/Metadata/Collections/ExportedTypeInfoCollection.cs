@@ -21,25 +21,21 @@ public sealed class ExportedTypeInfoCollection : MetadataInfoCollection<Exported
 
     public static ExportedTypeInfoCollection Create(ExportedTypeHandleCollection exportedTypeHandles, MetadataReader metadataReader)
     {
-        if (exportedTypeHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new ExportedTypeInfoCollection(exportedTypeHandles.ToImmutableArray(), metadataReader);
+        return (exportedTypeHandles.Count == 0)
+             ? Empty
+             : new ExportedTypeInfoCollection([.. exportedTypeHandles], metadataReader);
     }
 
     public static ExportedTypeInfoCollection Create(ImmutableArray<ExportedTypeHandle> exportedTypeHandles, MetadataReader metadataReader)
     {
-        if (exportedTypeHandles.Length == 0)
-        {
-            return Empty;
-        }
-        return new ExportedTypeInfoCollection(exportedTypeHandles, metadataReader);
+        return (exportedTypeHandles.Length == 0)
+             ? Empty
+             : new ExportedTypeInfoCollection(exportedTypeHandles, metadataReader);
     }
 
-    protected override ExportedTypeInfo Resolve(ExportedTypeHandle exportedTypeHandle, MetadataReader metadataReader)
+    protected override ExportedTypeInfo Resolve(ExportedTypeHandle metadataHandle, MetadataReader metadataReader)
     {
-        var exportedTypeInfo = CompilerInfo.Instance.Resolve(exportedTypeHandle, metadataReader);
+        var exportedTypeInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(exportedTypeInfo is not null);
         return exportedTypeInfo;
     }

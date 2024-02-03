@@ -1,9 +1,9 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
-using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -19,7 +19,7 @@ public sealed class GenericParameterInfo : MetadataInfo
 
     private GenericParameterInfo(GenericParameter genericParameter, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _genericParameter = genericParameter;
@@ -100,6 +100,7 @@ public sealed class GenericParameterInfo : MetadataInfo
 
     public static GenericParameterInfo Create(GenericParameterHandle genericParameterHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var genericParameter = metadataReader.GetGenericParameter(genericParameterHandle);
         return new GenericParameterInfo(genericParameter, metadataReader);
     }

@@ -32,7 +32,7 @@ public static class Program
             .UseExceptionHandler()
             .CancelOnProcessTermination()
             .Build();
-        return await parser.InvokeAsync(args);
+        return await parser.InvokeAsync(args).ConfigureAwait(false);
     }
 
     public static void Run()

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection.Metadata;
-using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -20,13 +19,13 @@ public abstract partial class MetadataInfoCollection<TMetadataInfo, TMetadataHan
     protected MetadataInfoCollection()
     {
         _metadataReader = null;
-        _metadataHandles = ImmutableArray<TMetadataHandle>.Empty;
-        _values = Array.Empty<TMetadataInfo>();
+        _metadataHandles = [];
+        _values = [];
     }
 
     protected MetadataInfoCollection(ImmutableArray<TMetadataHandle> metadataHandles, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
         Debug.Assert(!metadataHandles.IsDefaultOrEmpty);
 
         _metadataReader = metadataReader;

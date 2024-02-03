@@ -21,16 +21,14 @@ public sealed class ParameterInfoCollection : MetadataInfoCollection<ParameterIn
 
     public static ParameterInfoCollection Create(ParameterHandleCollection parameterHandles, MetadataReader metadataReader)
     {
-        if (parameterHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new ParameterInfoCollection(parameterHandles.ToImmutableArray(), metadataReader);
+        return (parameterHandles.Count == 0)
+             ? Empty
+             : new ParameterInfoCollection([.. parameterHandles], metadataReader);
     }
 
-    protected override ParameterInfo Resolve(ParameterHandle parameterHandle, MetadataReader metadataReader)
+    protected override ParameterInfo Resolve(ParameterHandle metadataHandle, MetadataReader metadataReader)
     {
-        var parameterInfo = CompilerInfo.Instance.Resolve(parameterHandle, metadataReader);
+        var parameterInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(parameterInfo is not null);
         return parameterInfo;
     }

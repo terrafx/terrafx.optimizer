@@ -21,16 +21,14 @@ public sealed class FieldDefinitionInfoCollection : MetadataInfoCollection<Field
 
     public static FieldDefinitionInfoCollection Create(FieldDefinitionHandleCollection fieldDefinitionHandles, MetadataReader metadataReader)
     {
-        if (fieldDefinitionHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new FieldDefinitionInfoCollection(fieldDefinitionHandles.ToImmutableArray(), metadataReader);
+        return (fieldDefinitionHandles.Count == 0)
+             ? Empty
+             : new FieldDefinitionInfoCollection([.. fieldDefinitionHandles], metadataReader);
     }
 
-    protected override FieldDefinitionInfo Resolve(FieldDefinitionHandle fieldDefinitionHandle, MetadataReader metadataReader)
+    protected override FieldDefinitionInfo Resolve(FieldDefinitionHandle metadataHandle, MetadataReader metadataReader)
     {
-        var fieldDefinitionInfo = CompilerInfo.Instance.Resolve(fieldDefinitionHandle, metadataReader);
+        var fieldDefinitionInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(fieldDefinitionInfo is not null);
         return fieldDefinitionInfo;
     }

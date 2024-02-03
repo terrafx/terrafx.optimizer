@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using static TerraFX.Optimization.Utilities.ExceptionUtilities;
@@ -15,7 +16,7 @@ public sealed class ConstantInfo : MetadataInfo
 
     private ConstantInfo(Constant constant, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _constant = constant;
@@ -48,6 +49,7 @@ public sealed class ConstantInfo : MetadataInfo
 
     public static ConstantInfo Create(ConstantHandle constantHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var constant = metadataReader.GetConstant(constantHandle);
         return new ConstantInfo(constant, metadataReader);
     }

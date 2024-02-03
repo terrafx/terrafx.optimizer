@@ -65,7 +65,6 @@ public sealed partial class CompilerInfo
         {
             return null;
         }
-
         return entityHandle.Kind switch {
             HandleKind.ModuleDefinition => ThrowNotImplementedException<MetadataInfo>(),
             HandleKind.TypeReference => Resolve((TypeReferenceHandle)entityHandle, metadataReader),
@@ -110,199 +109,155 @@ public sealed partial class CompilerInfo
 
     public AssemblyFileInfo? Resolve(AssemblyFileHandle assemblyFileHandle, MetadataReader metadataReader)
     {
-        if (assemblyFileHandle.IsNil)
-        {
-            return null;
-        }
-        return _assemblyFiles.GetOrAdd(assemblyFileHandle, AssemblyFileInfo.Create, metadataReader);
+        return assemblyFileHandle.IsNil
+             ? null
+             : _assemblyFiles.GetOrAdd(assemblyFileHandle, AssemblyFileInfo.Create, metadataReader);
     }
 
     public AssemblyReferenceInfo? Resolve(AssemblyReferenceHandle assemblyReferenceHandle, MetadataReader metadataReader)
     {
-        if (assemblyReferenceHandle.IsNil)
-        {
-            return null;
-        }
-        return _assemblyReferences.GetOrAdd(assemblyReferenceHandle, AssemblyReferenceInfo.Create, metadataReader);
+        return assemblyReferenceHandle.IsNil
+             ? null
+             : _assemblyReferences.GetOrAdd(assemblyReferenceHandle, AssemblyReferenceInfo.Create, metadataReader);
     }
 
     public ConstantInfo? Resolve(ConstantHandle constantHandle, MetadataReader metadataReader)
     {
-        if (constantHandle.IsNil)
-        {
-            return null;
-        }
-        return _constants.GetOrAdd(constantHandle, ConstantInfo.Create, metadataReader);
+        return constantHandle.IsNil
+             ? null
+             : _constants.GetOrAdd(constantHandle, ConstantInfo.Create, metadataReader);
     }
 
     public CustomAttributeInfo? Resolve(CustomAttributeHandle customAttributeHandle, MetadataReader metadataReader)
     {
-        if (customAttributeHandle.IsNil)
-        {
-            return null;
-        }
-        return _customAttributes.GetOrAdd(customAttributeHandle, CustomAttributeInfo.Create, metadataReader);
+        return customAttributeHandle.IsNil
+             ? null
+             : _customAttributes.GetOrAdd(customAttributeHandle, CustomAttributeInfo.Create, metadataReader);
     }
 
     public DeclarativeSecurityAttributeInfo? Resolve(DeclarativeSecurityAttributeHandle declarativeSecurityAttributeHandle, MetadataReader metadataReader)
     {
-        if (declarativeSecurityAttributeHandle.IsNil)
-        {
-            return null;
-        }
-        return _declarativeSecurityAttributes.GetOrAdd(declarativeSecurityAttributeHandle, DeclarativeSecurityAttributeInfo.Create, metadataReader);
+        return declarativeSecurityAttributeHandle.IsNil
+             ? null
+             : _declarativeSecurityAttributes.GetOrAdd(declarativeSecurityAttributeHandle, DeclarativeSecurityAttributeInfo.Create, metadataReader);
     }
 
     public EventDefinitionInfo? Resolve(EventDefinitionHandle eventDefinitionHandle, MetadataReader metadataReader)
     {
-        if (eventDefinitionHandle.IsNil)
-        {
-            return null;
-        }
-        return _eventDefinitions.GetOrAdd(eventDefinitionHandle, EventDefinitionInfo.Create, metadataReader);
+        return eventDefinitionHandle.IsNil
+             ? null
+             : _eventDefinitions.GetOrAdd(eventDefinitionHandle, EventDefinitionInfo.Create, metadataReader);
     }
 
     public FieldDefinitionInfo? Resolve(FieldDefinitionHandle fieldDefinitionHandle, MetadataReader metadataReader)
     {
-        if (fieldDefinitionHandle.IsNil)
-        {
-            return null;
-        }
-        return _fieldDefinitions.GetOrAdd(fieldDefinitionHandle, FieldDefinitionInfo.Create, metadataReader);
+        return fieldDefinitionHandle.IsNil
+             ? null
+             : _fieldDefinitions.GetOrAdd(fieldDefinitionHandle, FieldDefinitionInfo.Create, metadataReader);
     }
 
     public GenericParameterConstraintInfo? Resolve(GenericParameterConstraintHandle genericParameterConstraintHandle, MetadataReader metadataReader)
     {
-        if (genericParameterConstraintHandle.IsNil)
-        {
-            return null;
-        }
-        return _genericParameterConstraints.GetOrAdd(genericParameterConstraintHandle, GenericParameterConstraintInfo.Create, metadataReader);
+        return genericParameterConstraintHandle.IsNil
+             ? null
+             : _genericParameterConstraints.GetOrAdd(genericParameterConstraintHandle, GenericParameterConstraintInfo.Create, metadataReader);
     }
 
     public GenericParameterInfo? Resolve(GenericParameterHandle genericParameterHandle, MetadataReader metadataReader)
     {
-        if (genericParameterHandle.IsNil)
-        {
-            return null;
-        }
-        return _genericParameters.GetOrAdd(genericParameterHandle, GenericParameterInfo.Create, metadataReader);
+        return genericParameterHandle.IsNil
+             ? null
+             : _genericParameters.GetOrAdd(genericParameterHandle, GenericParameterInfo.Create, metadataReader);
     }
 
     public ExportedTypeInfo? Resolve(ExportedTypeHandle exportedTypeHandle, MetadataReader metadataReader)
     {
-        if (exportedTypeHandle.IsNil)
-        {
-            return null;
-        }
-        return _exportedTypes.GetOrAdd(exportedTypeHandle, ExportedTypeInfo.Create, metadataReader);
+        return exportedTypeHandle.IsNil
+             ? null
+             : _exportedTypes.GetOrAdd(exportedTypeHandle, ExportedTypeInfo.Create, metadataReader);
     }
 
     public InterfaceImplementationInfo? Resolve(InterfaceImplementationHandle interfaceImplementationHandle, MetadataReader metadataReader)
     {
-        if (interfaceImplementationHandle.IsNil)
-        {
-            return null;
-        }
-        return _interfaceImplementations.GetOrAdd(interfaceImplementationHandle, InterfaceImplementationInfo.Create, metadataReader);
+        return interfaceImplementationHandle.IsNil
+             ? null
+             : _interfaceImplementations.GetOrAdd(interfaceImplementationHandle, InterfaceImplementationInfo.Create, metadataReader);
     }
 
     public MemberReferenceInfo? Resolve(MemberReferenceHandle memberReferenceHandle, MetadataReader metadataReader)
     {
-        if (memberReferenceHandle.IsNil)
-        {
-            return null;
-        }
-        return _memberReferences.GetOrAdd(memberReferenceHandle, MemberReferenceInfo.Create, metadataReader);
+        return memberReferenceHandle.IsNil
+             ? null
+             : _memberReferences.GetOrAdd(memberReferenceHandle, MemberReferenceInfo.Create, metadataReader);
     }
 
     public MethodDefinitionInfo? Resolve(MethodDefinitionHandle methodDefinitionHandle, MetadataReader metadataReader)
     {
-        if (methodDefinitionHandle.IsNil)
-        {
-            return null;
-        }
-        return _methodDefinitions.GetOrAdd(methodDefinitionHandle, MethodDefinitionInfo.Create, metadataReader);
+        return methodDefinitionHandle.IsNil
+             ? null
+             : _methodDefinitions.GetOrAdd(methodDefinitionHandle, MethodDefinitionInfo.Create, metadataReader);
     }
 
     public MethodImplementationInfo? Resolve(MethodImplementationHandle methodImplementationHandle, MetadataReader metadataReader)
     {
-        if (methodImplementationHandle.IsNil)
-        {
-            return null;
-        }
-        return _methodImplementations.GetOrAdd(methodImplementationHandle, MethodImplementationInfo.Create, metadataReader);
+        return methodImplementationHandle.IsNil
+             ? null
+             : _methodImplementations.GetOrAdd(methodImplementationHandle, MethodImplementationInfo.Create, metadataReader);
     }
 
     public MethodSpecificationInfo? Resolve(MethodSpecificationHandle methodSpecificationHandle, MetadataReader metadataReader)
     {
-        if (methodSpecificationHandle.IsNil)
-        {
-            return null;
-        }
-        return _methodSpecifications.GetOrAdd(methodSpecificationHandle, MethodSpecificationInfo.Create, metadataReader);
+        return methodSpecificationHandle.IsNil
+             ? null
+             : _methodSpecifications.GetOrAdd(methodSpecificationHandle, MethodSpecificationInfo.Create, metadataReader);
     }
 
     public NamespaceDefinitionInfo? Resolve(NamespaceDefinitionHandle namespaceDefinitionHandle, MetadataReader metadataReader)
     {
-        if (namespaceDefinitionHandle.IsNil)
-        {
-            return null;
-        }
-        return _namespaceDefinitions.GetOrAdd(namespaceDefinitionHandle, NamespaceDefinitionInfo.Create, metadataReader);
+        return namespaceDefinitionHandle.IsNil
+             ? null
+             : _namespaceDefinitions.GetOrAdd(namespaceDefinitionHandle, NamespaceDefinitionInfo.Create, metadataReader);
     }
 
     public ParameterInfo? Resolve(ParameterHandle parameterHandle, MetadataReader metadataReader)
     {
-        if (parameterHandle.IsNil)
-        {
-            return null;
-        }
-        return _parameters.GetOrAdd(parameterHandle, ParameterInfo.Create, metadataReader);
+        return parameterHandle.IsNil
+             ? null
+             : _parameters.GetOrAdd(parameterHandle, ParameterInfo.Create, metadataReader);
     }
 
     public PropertyDefinitionInfo? Resolve(PropertyDefinitionHandle propertyDefinitionHandle, MetadataReader metadataReader)
     {
-        if (propertyDefinitionHandle.IsNil)
-        {
-            return null;
-        }
-        return _propertyDefinitions.GetOrAdd(propertyDefinitionHandle, PropertyDefinitionInfo.Create, metadataReader);
+        return propertyDefinitionHandle.IsNil
+             ? null
+             : _propertyDefinitions.GetOrAdd(propertyDefinitionHandle, PropertyDefinitionInfo.Create, metadataReader);
     }
 
     public StandaloneSignatureInfo? Resolve(StandaloneSignatureHandle standaloneSignatureHandle, MetadataReader metadataReader)
     {
-        if (standaloneSignatureHandle.IsNil)
-        {
-            return null;
-        }
-        return _standaloneSignatures.GetOrAdd(standaloneSignatureHandle, StandaloneSignatureInfo.Create, metadataReader);
+        return standaloneSignatureHandle.IsNil
+             ? null
+             : _standaloneSignatures.GetOrAdd(standaloneSignatureHandle, StandaloneSignatureInfo.Create, metadataReader);
     }
 
     public TypeDefinitionInfo? Resolve(TypeDefinitionHandle typeDefinitionHandle, MetadataReader metadataReader)
     {
-        if (typeDefinitionHandle.IsNil)
-        {
-            return null;
-        }
-        return _typeDefinitions.GetOrAdd(typeDefinitionHandle, TypeDefinitionInfo.Create, metadataReader);
+        return typeDefinitionHandle.IsNil
+             ? null
+             : _typeDefinitions.GetOrAdd(typeDefinitionHandle, TypeDefinitionInfo.Create, metadataReader);
     }
 
     public TypeReferenceInfo? Resolve(TypeReferenceHandle typeReferenceHandle, MetadataReader metadataReader)
     {
-        if (typeReferenceHandle.IsNil)
-        {
-            return null;
-        }
-        return _typeReferences.GetOrAdd(typeReferenceHandle, TypeReferenceInfo.Create, metadataReader);
+        return typeReferenceHandle.IsNil
+             ? null
+             : _typeReferences.GetOrAdd(typeReferenceHandle, TypeReferenceInfo.Create, metadataReader);
     }
 
     public TypeSpecificationInfo? Resolve(TypeSpecificationHandle typeSpecificationHandle, MetadataReader metadataReader)
     {
-        if (typeSpecificationHandle.IsNil)
-        {
-            return null;
-        }
-        return _typeSpecifications.GetOrAdd(typeSpecificationHandle, TypeSpecificationInfo.Create, metadataReader);
+        return typeSpecificationHandle.IsNil
+             ? null
+             : _typeSpecifications.GetOrAdd(typeSpecificationHandle, TypeSpecificationInfo.Create, metadataReader);
     }
 }

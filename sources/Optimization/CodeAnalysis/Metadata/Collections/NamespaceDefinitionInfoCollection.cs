@@ -21,16 +21,14 @@ public sealed class NamespaceDefinitionInfoCollection : MetadataInfoCollection<N
 
     public static NamespaceDefinitionInfoCollection Create(ImmutableArray<NamespaceDefinitionHandle> namespaceDefinitionHandles, MetadataReader metadataReader)
     {
-        if (namespaceDefinitionHandles.Length == 0)
-        {
-            return Empty;
-        }
-        return new NamespaceDefinitionInfoCollection(namespaceDefinitionHandles, metadataReader);
+        return namespaceDefinitionHandles.Length == 0
+             ? Empty
+             : new NamespaceDefinitionInfoCollection(namespaceDefinitionHandles, metadataReader);
     }
 
-    protected override NamespaceDefinitionInfo Resolve(NamespaceDefinitionHandle namespaceDefinitionHandle, MetadataReader metadataReader)
+    protected override NamespaceDefinitionInfo Resolve(NamespaceDefinitionHandle metadataHandle, MetadataReader metadataReader)
     {
-        var namespaceDefinitionInfo = CompilerInfo.Instance.Resolve(namespaceDefinitionHandle, metadataReader);
+        var namespaceDefinitionInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(namespaceDefinitionInfo is not null);
         return namespaceDefinitionInfo;
     }

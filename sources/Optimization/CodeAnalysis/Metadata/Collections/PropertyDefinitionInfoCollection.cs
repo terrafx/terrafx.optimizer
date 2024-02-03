@@ -21,16 +21,14 @@ public sealed class PropertyDefinitionInfoCollection : MetadataInfoCollection<Pr
 
     public static PropertyDefinitionInfoCollection Create(PropertyDefinitionHandleCollection propertyDefinitionHandles, MetadataReader metadataReader)
     {
-        if (propertyDefinitionHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new PropertyDefinitionInfoCollection(propertyDefinitionHandles.ToImmutableArray(), metadataReader);
+        return propertyDefinitionHandles.Count == 0
+             ? Empty
+             : new PropertyDefinitionInfoCollection([.. propertyDefinitionHandles], metadataReader);
     }
 
-    protected override PropertyDefinitionInfo Resolve(PropertyDefinitionHandle propertyDefinitionHandle, MetadataReader metadataReader)
+    protected override PropertyDefinitionInfo Resolve(PropertyDefinitionHandle metadataHandle, MetadataReader metadataReader)
     {
-        var propertyDefinitionInfo = CompilerInfo.Instance.Resolve(propertyDefinitionHandle, metadataReader);
+        var propertyDefinitionInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(propertyDefinitionInfo is not null);
         return propertyDefinitionInfo;
     }

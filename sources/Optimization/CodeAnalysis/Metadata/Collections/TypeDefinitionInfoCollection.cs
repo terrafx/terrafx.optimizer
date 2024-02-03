@@ -21,16 +21,14 @@ public sealed class TypeDefinitionInfoCollection : MetadataInfoCollection<TypeDe
 
     public static TypeDefinitionInfoCollection Create(ImmutableArray<TypeDefinitionHandle> typeDefinitionHandles, MetadataReader metadataReader)
     {
-        if (typeDefinitionHandles.Length == 0)
-        {
-            return Empty;
-        }
-        return new TypeDefinitionInfoCollection(typeDefinitionHandles, metadataReader);
+        return (typeDefinitionHandles.Length == 0)
+             ? Empty
+             : new TypeDefinitionInfoCollection(typeDefinitionHandles, metadataReader);
     }
 
-    protected override TypeDefinitionInfo Resolve(TypeDefinitionHandle typeDefinitionHandle, MetadataReader metadataReader)
+    protected override TypeDefinitionInfo Resolve(TypeDefinitionHandle metadataHandle, MetadataReader metadataReader)
     {
-        var typeDefinitionInfo = CompilerInfo.Instance.Resolve(typeDefinitionHandle, metadataReader);
+        var typeDefinitionInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(typeDefinitionInfo is not null);
         return typeDefinitionInfo;
     }

@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Reflection.Metadata;
 using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
@@ -14,7 +15,7 @@ public abstract class StandaloneSignatureInfo : MetadataInfo
 
     protected StandaloneSignatureInfo(StandaloneSignature standaloneSignature, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _standaloneSignature = standaloneSignature;
@@ -44,6 +45,7 @@ public abstract class StandaloneSignatureInfo : MetadataInfo
 
     public static StandaloneSignatureInfo Create(StandaloneSignatureHandle standaloneSignatureHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var standaloneSignature = metadataReader.GetStandaloneSignature(standaloneSignatureHandle);
 
         return standaloneSignature.GetKind() switch {

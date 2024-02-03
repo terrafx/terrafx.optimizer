@@ -14,13 +14,9 @@ internal static unsafe class AppContextUtilities
         {
             return value;
         }
-        else if ((data is string stringValue) && bool.TryParse(stringValue, out value))
-        {
-            return value;
-        }
         else
         {
-            return defaultValue;
+            return (data is string stringValue) && bool.TryParse(stringValue, out value) ? value : defaultValue;
         }
     }
 }

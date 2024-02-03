@@ -5,14 +5,9 @@ using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
-public sealed class PrimitiveTypeInfo : MetadataInfo
+public sealed class PrimitiveTypeInfo(PrimitiveTypeCode typeCode) : MetadataInfo
 {
-    private readonly PrimitiveTypeCode _typeCode;
-
-    public PrimitiveTypeInfo(PrimitiveTypeCode typeCode)
-    {
-        _typeCode = typeCode;
-    }
+    private readonly PrimitiveTypeCode _typeCode = typeCode;
 
     public PrimitiveTypeCode TypeCode => _typeCode;
 

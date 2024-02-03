@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using static TerraFX.Optimization.Utilities.ExceptionUtilities;
@@ -18,7 +19,7 @@ public sealed class MethodImplementationInfo : MetadataInfo
 
     private MethodImplementationInfo(MethodImplementation methodImplementation, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _methodImplementation = methodImplementation;
@@ -97,6 +98,7 @@ public sealed class MethodImplementationInfo : MetadataInfo
 
     public static MethodImplementationInfo Create(MethodImplementationHandle methodImplementationHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var methodImplementation = metadataReader.GetMethodImplementation(methodImplementationHandle);
         return new MethodImplementationInfo(methodImplementation, metadataReader);
     }

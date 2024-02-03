@@ -1,5 +1,6 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using static TerraFX.Optimization.Utilities.ExceptionUtilities;
@@ -17,7 +18,7 @@ public abstract class MemberReferenceInfo : MetadataInfo
 
     protected MemberReferenceInfo(MemberReference memberReference, MetadataReader metadataReader)
     {
-        ThrowIfNull(metadataReader);
+        ArgumentNullException.ThrowIfNull(metadataReader);
 
         _metadataReader = metadataReader;
         _memberReference = memberReference;
@@ -82,6 +83,7 @@ public abstract class MemberReferenceInfo : MetadataInfo
 
     public static MemberReferenceInfo Create(MemberReferenceHandle memberReferenceHandle, MetadataReader metadataReader)
     {
+        ArgumentNullException.ThrowIfNull(metadataReader);
         var memberReference = metadataReader.GetMemberReference(memberReferenceHandle);
 
         return memberReference.GetKind() switch {

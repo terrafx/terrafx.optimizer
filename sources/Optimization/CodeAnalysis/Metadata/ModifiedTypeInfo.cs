@@ -1,7 +1,7 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
+using System;
 using System.Text;
-using static TerraFX.Optimization.Utilities.ExceptionUtilities;
 
 namespace TerraFX.Optimization.CodeAnalysis;
 
@@ -13,8 +13,8 @@ public sealed class ModifiedTypeInfo : MetadataInfo
 
     public ModifiedTypeInfo(MetadataInfo modifier, MetadataInfo unmodifiedType, bool isRequired)
     {
-        ThrowIfNull(modifier);
-        ThrowIfNull(unmodifiedType);
+        ArgumentNullException.ThrowIfNull(modifier);
+        ArgumentNullException.ThrowIfNull(unmodifiedType);
 
         _modifier = modifier;
         _unmodifiedType = unmodifiedType;

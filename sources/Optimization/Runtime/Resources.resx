@@ -123,19 +123,10 @@
   <data name="InvalidTypeMessage" xml:space="preserve">
     <value>'{0}' is not an instance of '{1}'</value>
   </data>
-  <data name="NotImplementedMessage" xml:space="preserve">
-    <value>The given code path is not currently implemented</value>
-  </data>
   <data name="UnsupportedValueMessage" xml:space="preserve">
     <value>'{0}' has an unsupported value of '{1}'</value>
   </data>
-  <data name="ValueIsNullMessage" xml:space="preserve">
-    <value>'{0}' is null</value>
-  </data>
   <data name="ValueIsReadOnlyMessage" xml:space="preserve">
     <value>'{0}' is readonly</value>
-  </data>
-  <data name="ValueIsZeroMessage" xml:space="preserve">
-    <value>'{0}' is zero</value>
   </data>
 </root>

@@ -21,16 +21,14 @@ public sealed class CustomAttributeInfoCollection : MetadataInfoCollection<Custo
 
     public static CustomAttributeInfoCollection Create(CustomAttributeHandleCollection customAttributeHandles, MetadataReader metadataReader)
     {
-        if (customAttributeHandles.Count == 0)
-        {
-            return Empty;
-        }
-        return new CustomAttributeInfoCollection(customAttributeHandles.ToImmutableArray(), metadataReader);
+        return (customAttributeHandles.Count == 0)
+             ? Empty
+             : new CustomAttributeInfoCollection([.. customAttributeHandles], metadataReader);
     }
 
-    protected override CustomAttributeInfo Resolve(CustomAttributeHandle customAttributeHandle, MetadataReader metadataReader)
+    protected override CustomAttributeInfo Resolve(CustomAttributeHandle metadataHandle, MetadataReader metadataReader)
     {
-        var customAttributeInfo = CompilerInfo.Instance.Resolve(customAttributeHandle, metadataReader);
+        var customAttributeInfo = CompilerInfo.Instance.Resolve(metadataHandle, metadataReader);
         Debug.Assert(customAttributeInfo is not null);
         return customAttributeInfo;
     }
