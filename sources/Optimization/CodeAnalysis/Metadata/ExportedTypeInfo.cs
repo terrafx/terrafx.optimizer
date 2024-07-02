@@ -83,9 +83,48 @@ public sealed class ExportedTypeInfo : MetadataInfo
                         break;
                     }
 
-                    default:
+                    case HandleKind.ModuleDefinition:
+                    case HandleKind.TypeReference:
+                    case HandleKind.TypeDefinition:
+                    case HandleKind.FieldDefinition:
+                    case HandleKind.MethodDefinition:
+                    case HandleKind.Parameter:
+                    case HandleKind.InterfaceImplementation:
+                    case HandleKind.MemberReference:
+                    case HandleKind.Constant:
+                    case HandleKind.CustomAttribute:
+                    case HandleKind.DeclarativeSecurityAttribute:
+                    case HandleKind.StandaloneSignature:
+                    case HandleKind.EventDefinition:
+                    case HandleKind.PropertyDefinition:
+                    case HandleKind.MethodImplementation:
+                    case HandleKind.ModuleReference:
+                    case HandleKind.TypeSpecification:
+                    case HandleKind.AssemblyDefinition:
+                    case HandleKind.ManifestResource:
+                    case HandleKind.GenericParameter:
+                    case HandleKind.MethodSpecification:
+                    case HandleKind.GenericParameterConstraint:
+                    case HandleKind.Document:
+                    case HandleKind.MethodDebugInformation:
+                    case HandleKind.LocalScope:
+                    case HandleKind.LocalVariable:
+                    case HandleKind.LocalConstant:
+                    case HandleKind.ImportScope:
+                    case HandleKind.CustomDebugInformation:
+                    case HandleKind.UserString:
+                    case HandleKind.Blob:
+                    case HandleKind.Guid:
+                    case HandleKind.String:
+                    case HandleKind.NamespaceDefinition:
                     {
                         ThrowForInvalidKind(implementationHandle.Kind);
+                        break;
+                    }
+
+                    default:
+                    {
+                        ThrowUnreachableException();
                         break;
                     }
                 }
@@ -178,7 +217,7 @@ public sealed class ExportedTypeInfo : MetadataInfo
         {
             Debug.Assert(Implementation is not ExportedTypeInfo);
             _ = builder.Append(@namespace);
-            _ = builder.Append('.'); 
+            _ = builder.Append('.');
         }
 
         _ = builder.Append(Name);

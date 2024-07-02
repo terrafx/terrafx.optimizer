@@ -175,6 +175,31 @@ public sealed partial class Instruction(Opcode opcode, Operand operand) : ICompa
                     operandValue = instructions[targetOffset];
                     break;
                 }
+
+                case OperandKind.InlineNone:
+                case OperandKind.InlineField:
+                case OperandKind.InlineI:
+                case OperandKind.InlineI8:
+                case OperandKind.InlineMethod:
+                case OperandKind.InlineR:
+                case OperandKind.InlineSig:
+                case OperandKind.InlineString:
+                case OperandKind.InlineTok:
+                case OperandKind.InlineType:
+                case OperandKind.InlineVar:
+                case OperandKind.ShortInlineI:
+                case OperandKind.ShortInlineR:
+                case OperandKind.ShortInlineVar:
+                {
+                    // Nothing to handle
+                    break;
+                }
+
+                default:
+                {
+                    ThrowUnreachableException();
+                    break;
+                }
             }
 
             // This triggers the validation that the value is correct for the operand kind.
