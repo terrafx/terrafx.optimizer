@@ -94,7 +94,7 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: nuget_preview
         path: ./artifacts
@@ -136,7 +136,7 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: nuget_release
         path: ./artifacts
@@ -156,7 +156,7 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     needs: [ windows-x64, linux-x64, macos-x64, sign-nuget-preview ]
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: windows_release_x64
         path: ./artifacts
@@ -172,7 +172,7 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     needs: [ windows-x64, linux-x64, macos-x64, sign-nuget-preview ]
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: windows_release_x64
         path: ./artifacts
