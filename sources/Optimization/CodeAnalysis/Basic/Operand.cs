@@ -310,7 +310,7 @@ public struct Operand : IEquatable<Operand>
     public readonly double AsDouble() => (double)Value!;
 
     public readonly FieldDefinitionInfo AsFieldDefinitionInfo() => (FieldDefinitionInfo)Value!;
-    
+
     public readonly Instruction AsInstruction() => (Instruction)Value!;
 
     public readonly ImmutableArray<Instruction> AsInstructions() => (ImmutableArray<Instruction>)Value!;

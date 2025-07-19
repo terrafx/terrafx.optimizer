@@ -38,7 +38,7 @@ public sealed class FieldReferenceInfo : MemberReferenceInfo
     {
         var builder = new StringBuilder();
 
-        _ = builder.Append(Signature);;
+        _ = builder.Append(Signature);
         _ = builder.Append(' ');
         _ = builder.Append(Parent);
         _ = builder.Append("::");

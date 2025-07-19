@@ -1,41 +1,17 @@
 // Copyright © Tanner Gooding and Contributors. Licensed under the MIT License (MIT). See License.md in the repository root for more information.
 
 using System;
-using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
-using System.Threading.Tasks;
 using TerraFX.Optimization.CodeAnalysis;
 
-namespace TerraFX.Optimization;
+namespace TerraFX.Optimizer;
 
-public static class Program
+internal static class Program
 {
-    private static readonly RootCommand s_rootCommand = new RootCommand("TerraFX IL Optimizer");
-
-    public static async Task<int> Main(params string[] args)
-    {
-        Handler.SetHandler(s_rootCommand, Run);
-
-        var parser = new CommandLineBuilder(s_rootCommand)
-            .UseHelp()
-            .UseEnvironmentVariableDirective()
-            .UseParseDirective()
-            .UseSuggestDirective()
-            .RegisterWithDotnetSuggest()
-            .UseTypoCorrections()
-            .UseParseErrorReporting()
-            .UseExceptionHandler()
-            .CancelOnProcessTermination()
-            .Build();
-        return await parser.InvokeAsync(args).ConfigureAwait(false);
-    }
-
-    public static void Run()
+    public static void Main()
     {
         using var peStream = File.OpenRead("TerraFX.Optimization.dll");
         using var peReader = new PEReader(peStream);

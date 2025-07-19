@@ -127,7 +127,7 @@ public sealed class Flowgraph
                             // adding it to the current block and returning true so that we can continue
                             // processing the current sequence.
 
-                            Debug.Assert(currentBlock.Contains(instruction) == false, "Expected the basic block to not contain the target instruction.");
+                            Debug.Assert(!currentBlock.Contains(instruction), "Expected the basic block to not contain the target instruction.");
 
                             currentBlock.LastInstruction = instruction;
                             instructionMap.Add(instruction, currentBlock);
@@ -191,6 +191,12 @@ public sealed class Flowgraph
                         // do not cause any new blocks to appear on the stack.
 
                         instruction = null;
+                        break;
+                    }
+
+                    default:
+                    {
+                        ThrowUnreachableException();
                         break;
                     }
                 }
