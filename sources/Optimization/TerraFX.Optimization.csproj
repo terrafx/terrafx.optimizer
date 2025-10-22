@@ -12,7 +12,8 @@
     <!-- CA1707: Identifiers should not contain underscores -->
     <!-- CA1724: Type names should not match namespaces -->
     <!-- CS1591: Missing XML comment for publicly visible type or member -->
-    <NoWarn>$(NoWarn);CA1024;CA1707;CA1724;CS1591</NoWarn>
+    <!-- IDE0130: Namespace does not match folder structure -->
+    <NoWarn>$(NoWarn);CA1024;CA1707;CA1724;CS1591;IDE0130</NoWarn>
   </PropertyGroup>
 
 </Project>

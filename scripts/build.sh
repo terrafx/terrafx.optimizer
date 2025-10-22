@@ -184,7 +184,7 @@ fi
 RepoRoot="$ScriptRoot/.."
 
 if [[ -z "$solution" ]]; then
-  solution="$RepoRoot/TerraFX.Optimizer.sln"
+  solution="$RepoRoot/TerraFX.Optimizer.slnx"
 fi
 
 ArtifactsDir="$RepoRoot/artifacts"
